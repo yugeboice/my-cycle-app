@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月经四阶段综合管理指南</title>
+<style>
+  :root {
+    --c-period: #c0392b;
+    --c-follicular: #27ae60;
+    --c-ovulation: #e67e22;
+    --c-luteal: #8e44ad;
+    --c-bg: #fdf6f0;
+    --c-card: #ffffff;
+    --c-text: #2c2c2c;
+    --c-muted: #666;
+    --c-border: #e8e0d5;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .hero {
+    background: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%);
+    color: white;
+    text-align: center;
+    padding: 48px 20px 36px;
+  }
+  .hero h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+  .hero p { opacity: 0.9; font-size: 0.95rem; max-width: 520px; margin: 0 auto; }
+  .cycle-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 20px 16px;
+    background: white;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .cycle-nav a {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: white;
+    transition: opacity 0.2s;
+  }
+  .cycle-nav a:hover { opacity: 0.8; }
+  .nav-period   { background: var(--c-period); }
+  .nav-follicular { background: var(--c-follicular); }
+  .nav-ovulation { background: var(--c-ovulation); }
+  .nav-luteal   { background: var(--c-luteal); }
+  .nav-conflict { background: #2c3e50; }
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+  .phase-section {
+    background: var(--c-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: white;
+  }
+  .phase-header.period   { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+  .phase-header.follicular { background: linear-gradient(135deg, #1a8a4a, #27ae60); }
+  .phase-header.ovulation { background: linear-gradient(135deg, #d35400, #e67e22); }
+  .phase-header.luteal   { background: linear-gradient(135deg, #6c3483, #8e44ad); }
+  .phase-icon { font-size: 2rem; }
+  .phase-header h2 { font-size: 1.3rem; font-weight: 700; }
+  .phase-header .days { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
+  .phase-body { padding: 20px 24px; }
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 22px 0 10px;
+    padding-left: 10px;
+    border-left: 4px solid;
+    color: var(--c-text);
+  }
+  .section-title.period   { border-color: var(--c-period); }
+  .section-title.follicular { border-color: var(--c-follicular); }
+  .section-title.ovulation { border-color: var(--c-ovulation); }
+  .section-title.luteal   { border-color: var(--c-luteal); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.88rem;
+  }
+  th {
+    background: #f4f1ec;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid var(--c-border);
+  }
+  td {
+    padding: 8px 10px;
+    border: 1px solid var(--c-border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafaf8; }
+  ul { padding-left: 18px; margin: 6px 0; }
+  ul li { margin: 4px 0; font-size: 0.9rem; }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 4px;
+    vertical-align: middle;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tag-blogger { background: #fdebd0; color: #a04000; }
+  .tag-medical { background: #d6eaf8; color: #1a5276; }
+  .tag-both    { background: #d5f5e3; color: #1a7a3a; }
+  .warning-box {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    margin: 10px 0;
+  }
+  .warning-box strong { color: #856404; }
+  .info-box {
+    background: #e8f4f8;
+    border: 1px solid #bee5eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    margin: 10px 0;
+  }
+  .hormone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .hormone-card {
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.82rem;
+  }
+  .hormone-card .hname { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+  .hormone-card .hlevel {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.78rem;
+  }
+  .level-low    { background: #fde8e8; color: #c0392b; }
+  .level-rising { background: #fef9e7; color: #b7950b; }
+  .level-high   { background: #d5f5e3; color: #1e8449; }
+  .level-falling{ background: #f4ecf7; color: #7d3c98; }
+  .level-peak   { background: #d6eaf8; color: #1a5276; }
+  .hbg-period      { background: #fdecea; }
+  .hbg-follicular  { background: #eafaf1; }
+  .hbg-ovulation   { background: #fef5e7; }
+  .hbg-luteal      { background: #f5eef8; }
+  .meal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .meal-card {
+    border-radius: 8px;
+    padding: 12px;
+    background: #f9f6f2;
+    border: 1px solid var(--c-border);
+  }
+  .meal-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; color: #555; }
+  .meal-card p  { font-size: 0.82rem; line-height: 1.5; color: #444; }
+  @media (max-width: 560px) {
+    .meal-grid { grid-template-columns: 1fr; }
+    .hormone-grid { grid-template-columns: repeat(2, 1fr); }
+    .phase-header { padding: 16px; }
+    .phase-body { padding: 14px 16px; }
+    .hero h1 { font-size: 1.4rem; }
+  }
+  .conflict-section {
+    background: var(--c-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .conflict-header {
+    background: linear-gradient(135deg, #2c3e50, #4a6741);
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .conflict-header h2 { font-size: 1.2rem; font-weight: 700; }
+  .conflict-body { padding: 20px 24px; }
+  .conflict-item {
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .conflict-topic {
+    background: #f4f1ec;
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .conflict-content { padding: 12px 14px; font-size: 0.88rem; }
+  .view-a { margin-bottom: 8px; }
+  .view-b { margin-bottom: 8px; }
+  .verdict {
+    background: #eafaf1;
+    border-left: 3px solid #27ae60;
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 8px;
+    font-size: 0.88rem;
+  }
+  .verdict strong { color: #1a7a3a; }
+  .disclaimer {
+    background: #f8f9fa;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    font-size: 0.82rem;
+    color: var(--c-muted);
+    text-align: center;
+    margin-bottom: 32px;
+    border: 1px solid var(--c-border);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>月经四阶段综合管理指南</h1>
+  <p>整合小红书博主"Mr林肤学笔记"底层逻辑 + 权威医学资料，覆盖饮食、运动、营养、护肤、生活方式</p>
+</div>
+
+<nav class="cycle-nav">
+  <a href="#period" class="nav-period">月经期 Day 1-5</a>
+  <a href="#follicular" class="nav-follicular">卵泡期 Day 6-13</a>
+  <a href="#ovulation" class="nav-ovulation">排卵期 Day 14-16</a>
+  <a href="#luteal" class="nav-luteal">黄体期 Day 17-28</a>
+  <a href="#conflict" class="nav-conflict">观点冲突对比</a>
+</nav>
+
+<div class="container">
+
+<!-- ========== 月经期 ========== -->
+<section class="phase-section" id="period">
+  <div class="phase-header period">
+    <div class="phase-icon">🔴</div>
+    <div>
+      <h2>月经期（行经期）</h2>
+      <div class="days">Day 1–5｜出血开始，身体最需要修复和补充</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="section-title period">一、身体与激素变化</div>
+    <div class="hormone-grid">
+      <div class="hormone-card hbg-period"><div class="hname">雌激素 E₂</div><span class="hlevel level-low">极低</span></div>
+      <div class="hormone-card hbg-period"><div class="hname">孕酮 P</div><span class="hlevel level-low">极低</span></div>
+      <div class="hormone-card hbg-period"><div class="hname">FSH</div><span class="hlevel level-rising">开始升高</span></div>
+      <div class="hormone-card hbg-period"><div class="hname">LH</div><span class="hlevel level-low">较低</span></div>
+      <div class="hormone-card hbg-period"><div class="hname">睾酮 T</div><span class="hlevel level-low">相对低</span></div>
+    </div>
+    <ul>
+      <li><strong>代谢：</strong>基础代谢率与卵泡期相近，前3天体力和情绪最低谷 <span class="tag tag-medical">Cleveland Clinic</span></li>
+      <li><strong>皮肤：</strong>雌激素和孕酮双低，皮脂腺相对安静，但部分人因炎症残留仍长痘；屏障最脆弱 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>能量：</strong>疲倦、腹胀、小腹酸痛；前列腺素引发炎症和宫缩；铁随经血流失</li>
+      <li><strong>情绪：</strong>情绪低落、注意力涣散；部分人对疼痛更敏感 <span class="tag tag-medical">Science News Today</span></li>
+    </ul>
+
+    <div class="section-title period">二、三餐饮食建议</div>
+    <div class="info-box">核心原则：补铁+抗炎+控血糖+充足优质脂肪，禁冷饮、奶茶、精制甜食。<span class="tag tag-both">博主+医学共识</span></div>
+    <div class="meal-grid">
+      <div class="meal-card">
+        <h4>早餐</h4>
+        <p>鸡蛋（2个）+ 温热小米粥或黑米粥（少量）+ 菠菜/猪肝炒菜 + 姜枣红糖水（若痛经）<br><br>目的：补铁、暖宫、稳血糖</p>
+      </div>
+      <div class="meal-card">
+        <h4>午餐</h4>
+        <p>牛肉/羊肉 80-100g + 番茄炖或清炒 + 深色蔬菜（焯水菠菜/西兰花）+ 少量糙米饭或杂粮饭<br><br>目的：血红素铁+蛋白质+维C促铁吸收</p>
+      </div>
+      <div class="meal-card">
+        <h4>晚餐</h4>
+        <p>深海鱼（三文鱼/沙丁鱼）100g + 清炒蔬菜用橄榄油/山茶油 + 南瓜/红薯少量<br><br>目的：Omega-3抗炎缓解痛经，优质脂肪维持激素原料</p>
+      </div>
+    </div>
+    <table>
+      <tr><th>食物类别</th><th>推荐</th><th>避免</th></tr>
+      <tr><td>蛋白质</td><td>牛肉、猪肝、羊肉、深海鱼、鸡蛋</td><td>加工肉制品、油炸鸡块</td></tr>
+      <tr><td>脂肪</td><td>橄榄油、山茶油、猪油炒菜；牛油果</td><td>大豆油、玉米油、外卖煎炸油<span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>主食</td><td>黑米粥、杂粮饭（少量）、红薯</td><td>白馒头、白粥、奶茶、精制甜品</td></tr>
+      <tr><td>蔬菜</td><td>菠菜（+柠檬汁促铁吸收）、南瓜、红枣</td><td>生冷沙拉（若有痛经）</td></tr>
+      <tr><td>特别</td><td>生姜+红糖水（缓解宫寒痛经）；70%以上黑巧少量（镁+铁）</td><td>冰饮、咖啡、辛辣火锅</td></tr>
+    </table>
+
+    <div class="section-title period">三、营养素补充</div>
+    <table>
+      <tr><th>营养素</th><th>剂量/形式</th><th>作用</th><th>来源</th></tr>
+      <tr><td>铁（氨基酸螯合铁）</td><td>18mg/日，随餐+维C</td><td>补充经血流失，预防贫血疲劳</td><td><span class="tag tag-medical">医学建议</span></td></tr>
+      <tr><td>甘氨酸镁/双甘氨酸镁</td><td>300-400mg/日，睡前2g</td><td>缓解痉挛、改善睡眠、减轻经痛</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>Omega-3鱼油</td><td>1-2g EPA+DHA/日</td><td>抑制前列腺素，减轻经期炎症和痛经</td><td><span class="tag tag-both">博主+医学</span></td></tr>
+      <tr><td>维生素C</td><td>1-3g/日（分次）</td><td>促进铁吸收，抗氧化，降低皮质醇</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>全谱活性B族</td><td>含5-MTHF叶酸+甲钴胺+P5P</td><td>支持能量代谢、减疲劳；随餐早上服用</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>维生素D3+K2</td><td>D3 2000-5000IU，K2 100mcg</td><td>调节免疫、抗炎、支持激素平衡</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>锌（吡啶甲酸锌）</td><td>20-30mg/日</td><td>调节皮脂腺，减少经期长痘风险</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+    </table>
+    <div class="warning-box"><strong>肠胃不好的用户：</strong>所有营养素随餐服用；甜菜碱盐酸盐（Betaine HCl）可帮助促进胃酸分泌、改善吸收不良。<span class="tag tag-blogger">Mr林肤</span></div>
+
+    <div class="section-title period">四、运动建议</div>
+    <table>
+      <tr><th>运动类型</th><th>推荐强度/时长</th><th>作用</th></tr>
+      <tr><td>散步/慢走</td><td>每次20-30分钟，轻松为主</td><td>促盆腔血液循环，缓解胀痛</td></tr>
+      <tr><td>阴瑜伽/修复性瑜伽</td><td>20-40分钟，猫牛式、蝴蝶式等</td><td>放松宫颈、舒缓腰背疼痛</td></tr>
+      <tr><td>轻柔拉伸/泡沫滚筒</td><td>15-20分钟</td><td>肌肉放松，促进修复</td></tr>
+    </table>
+    <div class="warning-box">
+      <strong>禁止（尤其Day 1-3）：</strong>HIIT、跳绳、深蹲大重量、腹部发力的卷腹、倒立类姿势——会增加腹压，加重盆腔充血，可能导致经血量增多。<br>
+      <strong>减脂 vs 增肌：</strong>此阶段均不适合，以恢复修养为主。
+      <span class="tag tag-medical">中国体育科学学会</span>
+    </div>
+
+    <div class="section-title period">五、生活方式</div>
+    <ul>
+      <li><strong>睡眠：</strong>争取21:00-22:00入睡，保证7-8小时；睡前补甘氨酸镁2g帮助体温下降，减少夜醒 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>压力管理：</strong>减少高强度工作排期；月经期皮质醇本已受激素影响，高压只会加重症状</li>
+      <li><strong>保暖：</strong>腹部保暖（暖宫贴），避免受凉加重痛经；不喝冷饮 <span class="tag tag-medical">临床建议</span></li>
+      <li><strong>社交：</strong>适当减少高耗能社交，自我滋养为主</li>
+      <li><strong>护肤重点：</strong>屏障最脆弱时期——停用洗面奶（或改用极温和氨基酸洁面）、暂停刷酸/维A酸/高浓度VC；只做清水洁面+保湿乳；适乐肤/丝塔芙/雅漾 <span class="tag tag-blogger">Mr林肤</span></li>
+    </ul>
+
+    <div class="section-title period">六、注意事项与禁忌</div>
+    <ul>
+      <li>不要此期节食或低脂饮食——会加剧激素原料不足，下个周期更难恢复</li>
+      <li>不要用奶茶、甜饮"奖励"自己——高GI食物拉高胰岛素，加重皮脂腺炎症，经期长痘加重</li>
+      <li>关注经期皮肤：此期长的痘通常与屏障受损有关，不要用清洁力强的产品处理 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li>大量运动"排毒"是错误认知——此期减少运动强度比增加更关键</li>
+      <li>脂肪粒/汗管瘤：与皮肤代谢、内分泌长期失衡有关，不是月经期重点护理目标，宜从全周期的胰岛素+激素调节入手</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 卵泡期 ========== -->
+<section class="phase-section" id="follicular">
+  <div class="phase-header follicular">
+    <div class="phase-icon">🌱</div>
+    <div>
+      <h2>卵泡期（增殖期）</h2>
+      <div class="days">Day 6–13｜雌激素攀升，全周期能量最佳窗口</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="section-title follicular">一、身体与激素变化</div>
+    <div class="hormone-grid">
+      <div class="hormone-card hbg-follicular"><div class="hname">雌激素 E₂</div><span class="hlevel level-rising">持续升高</span></div>
+      <div class="hormone-card hbg-follicular"><div class="hname">孕酮 P</div><span class="hlevel level-low">仍低</span></div>
+      <div class="hormone-card hbg-follicular"><div class="hname">FSH</div><span class="hlevel level-rising">升高→降低</span></div>
+      <div class="hormone-card hbg-follicular"><div class="hname">LH</div><span class="hlevel level-rising">低→升高</span></div>
+      <div class="hormone-card hbg-follicular"><div class="hname">睾酮 T</div><span class="hlevel level-rising">轻微升高</span></div>
+    </div>
+    <ul>
+      <li><strong>代谢：</strong>雌激素增强胰岛素敏感性，糖代谢效率提升10-15%；基础代谢率稳定 <span class="tag tag-medical">临床内分泌学杂志</span></li>
+      <li><strong>能量：</strong>精力充沛、思维清晰、动力最强；恢复速度加快 <span class="tag tag-medical">Well Tech</span></li>
+      <li><strong>皮肤：</strong>雌激素刺激胶原蛋白合成、保湿、提亮肤色；进入护肤最好时机</li>
+      <li><strong>情绪：</strong>积极、自信、社交欲强；适合规划重要工作和社交</li>
+    </ul>
+
+    <div class="section-title follicular">二、三餐饮食建议</div>
+    <div class="info-box">核心原则：高蛋白+优质脂肪+适量复合碳水+发酵食物（支持雌激素代谢），严格控精制碳水。<span class="tag tag-both">博主+医学共识</span></div>
+    <div class="meal-grid">
+      <div class="meal-card">
+        <h4>早餐</h4>
+        <p>燕麦鸡蛋饼（燕麦30g+鸡蛋2个）+ 无糖希腊酸奶 100g + 蓝莓/草莓一把<br><br>或：炒鸡蛋+橄榄油炒蔬菜+少量红薯</p>
+      </div>
+      <div class="meal-card">
+        <h4>午餐</h4>
+        <p>鸡胸肉/鱼 100-120g + 西兰花/彩椒炒（用山茶油）+ 糙米饭 80-100g + 少量泡菜/纳豆（发酵食物）</p>
+      </div>
+      <div class="meal-card">
+        <h4>晚餐</h4>
+        <p>白灼虾或牛肉 100g + 凉拌秋葵/蒸茄子 + 蒸山药少量<br><br>若有力量训练：训练后可适量加蛋白质</p>
+      </div>
+    </div>
+    <table>
+      <tr><th>重点食物</th><th>原因</th><th>来源</th></tr>
+      <tr><td>发酵食物：泡菜、纳豆、无糖酸奶、康普茶</td><td>支持肠道菌群帮助肝脏代谢雌激素</td><td><span class="tag tag-medical">医学</span></td></tr>
+      <tr><td>十字花科：西兰花、卷心菜</td><td>含DIM，促进雌激素健康代谢通路</td><td><span class="tag tag-medical">医学</span></td></tr>
+      <tr><td>优质脂肪：橄榄油、黄油、猪油、牛油果</td><td>胆固醇是雌激素合成原料，维持LH驱动力</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>亚麻籽（磨粉1汤匙）</td><td>木酚素调节雌激素代谢；种子循环卵泡期推荐</td><td><span class="tag tag-both">博主+种子循环</span></td></tr>
+      <tr><td>南瓜籽（1汤匙）</td><td>富含锌，支持卵泡发育和孕酮预合成</td><td><span class="tag tag-both">种子循环</span></td></tr>
+    </table>
+
+    <div class="section-title follicular">三、营养素补充</div>
+    <table>
+      <tr><th>营养素</th><th>剂量/形式</th><th>重点说明</th></tr>
+      <tr><td>全谱活性B族</td><td>随餐早上，含5-MTHF+甲钴胺</td><td>B族是线粒体能量产生催化剂，支持雌激素代谢；约30%女性MTHFR酶缺陷，必须选活性形式 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>维C</td><td>1-3g/日（分次）</td><td>此期皮质醇处于相对低位，维持抗氧化防御</td></tr>
+      <tr><td>D3+K2+镁</td><td>D3 2000-5000IU；镁300-400mg/日</td><td>全周期基础方案</td></tr>
+      <tr><td>锌（吡啶甲酸锌）</td><td>20-30mg/日</td><td>支持卵泡发育，调节皮脂</td></tr>
+      <tr><td>鱼油</td><td>1-2g EPA+DHA</td><td>维持胰岛素敏感性，减低炎症</td></tr>
+      <tr><td>NAC（N-乙酰半胱氨酸）</td><td>600-1200mg/日</td><td>补充谷胱甘肽前体，帮助肝脏代谢雌激素；适合乳腺增生/肌瘤者 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+    </table>
+
+    <div class="section-title follicular">四、运动建议</div>
+    <table>
+      <tr><th>运动类型</th><th>推荐</th><th>目标</th></tr>
+      <tr><td>力量训练（重点推荐）</td><td>每周3-4次，75-85% 1RM，复合动作为主（深蹲/硬拉/推举）</td><td>增肌黄金期：雌激素促进胶原蛋白合成和肌肉蛋白合成 <span class="tag tag-medical">Sports Med 2022</span></td></tr>
+      <tr><td>HIIT</td><td>每周1-2次，30-45分钟</td><td>燃脂效率高，恢复速度快</td></tr>
+      <tr><td>有氧：跑步/游泳/跳绳</td><td>每周3-4次，30-50分钟，中高强度</td><td>雌激素上升阶段有氧耐力最佳</td></tr>
+    </table>
+    <div class="info-box">
+      <strong>减脂 vs 增肌：</strong>此阶段二者兼顾效果最优。雌激素增强胰岛素敏感性，脂肪氧化效率高；同时雌激素的合成代谢作用支持肌肉适应。研究提示卵泡期进行渐进式超负荷训练，肌肉力量增益优于黄体期。<span class="tag tag-medical">Sports Med 2022</span>
+    </div>
+
+    <div class="section-title follicular">五、生活方式</div>
+    <ul>
+      <li><strong>工作：</strong>安排需要创意、高强度思考、重要决策的工作任务 <span class="tag tag-medical">Cleveland Clinic</span></li>
+      <li><strong>社交：</strong>精力旺盛，适合安排聚会、演讲、社交活动</li>
+      <li><strong>睡眠：</strong>维持22:00前入睡；镁继续维持</li>
+      <li><strong>护肤重点：</strong>皮肤状态最好的阶段，可以适量引入功效性护肤（维C精华、温和酸）；若有脂肪粒，此期皮肤代谢最活跃，适合使用含视黄醇（低浓度）或果酸产品 <span class="tag tag-blogger">Mr林肤</span></li>
+    </ul>
+
+    <div class="section-title follicular">六、注意事项</div>
+    <ul>
+      <li>能量旺盛容易过度训练——卵泡期末（Day 12-13）激素即将波动，不要在排卵日前拼命突破PR</li>
+      <li>不要因为"感觉好"就放松对饮食的控制——胰岛素稳定才是这个好状态的基础 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li>发酵食物不等于含糖饮料，含糖酸奶仍然会升高胰岛素</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 排卵期 ========== -->
+<section class="phase-section" id="ovulation">
+  <div class="phase-header ovulation">
+    <div class="phase-icon">✨</div>
+    <div>
+      <h2>排卵期</h2>
+      <div class="days">Day 14–16（±2天）｜激素峰值，全周期最强状态</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="section-title ovulation">一、身体与激素变化</div>
+    <div class="hormone-grid">
+      <div class="hormone-card hbg-ovulation"><div class="hname">雌激素 E₂</div><span class="hlevel level-peak">峰值→骤降</span></div>
+      <div class="hormone-card hbg-ovulation"><div class="hname">孕酮 P</div><span class="hlevel level-rising">开始升高</span></div>
+      <div class="hormone-card hbg-ovulation"><div class="hname">FSH</div><span class="hlevel level-peak">急升（LH峰）</span></div>
+      <div class="hormone-card hbg-ovulation"><div class="hname">LH</div><span class="hlevel level-peak">急速峰值</span></div>
+      <div class="hormone-card hbg-ovulation"><div class="hname">睾酮 T</div><span class="hlevel level-peak">短暂升高</span></div>
+    </div>
+    <ul>
+      <li><strong>体力：</strong>肌肉力量、爆发力、协调能力全周期最佳 <span class="tag tag-medical">HealCycle</span></li>
+      <li><strong>皮肤：</strong>雌激素峰值促进胶原蛋白；短暂睾酮升高可能带来轻微出油，部分人在排卵日前后长1-2颗</li>
+      <li><strong>注意：</strong>排卵期雌激素→relaxin（松弛素）水平升高，韧带松弛度增加，大重量训练需注意关节保护 <span class="tag tag-medical">医学</span></li>
+      <li><strong>情绪：</strong>社交欲旺盛、外向自信、魅力感最强</li>
+    </ul>
+
+    <div class="section-title ovulation">二、三餐饮食建议</div>
+    <div class="meal-grid">
+      <div class="meal-card">
+        <h4>早餐</h4>
+        <p>紫薯豆浆 + 水煮蛋1-2个 + 一把浆果<br><br>或：希腊酸奶 + 奇亚籽 + 橙子</p>
+      </div>
+      <div class="meal-card">
+        <h4>午餐</h4>
+        <p>藜麦沙拉（藜麦50g+鸡胸/虾80g+彩椒/番茄/芝麻菜）+ 亚麻籽油拌 + 一碗清汤<br><br>目的：抗氧化+高纤维帮助雌激素代谢</p>
+      </div>
+      <div class="meal-card">
+        <h4>晚餐</h4>
+        <p>清蒸鲈鱼/鳕鱼 120g + 蒜蓉炒绿叶菜（用橄榄油）+ 玉米半根（若当日训练）</p>
+      </div>
+    </div>
+    <table>
+      <tr><th>饮食侧重</th><th>推荐食物</th><th>原因</th></tr>
+      <tr><td>高纤维蔬菜（生/轻煮）</td><td>西兰花、芹菜、紫甘蓝、番茄</td><td>膳食纤维帮助雌激素通过粪便排出，防止雌激素在肠道再吸收 <span class="tag tag-medical">医学</span></td></tr>
+      <tr><td>锌+维C协同</td><td>南瓜籽、彩椒、猕猴桃</td><td>支持排卵质量和卵子释放</td></tr>
+      <tr><td>清淡控盐</td><td>减少加工食品</td><td>排卵日前后部分人有轻微水肿，控盐有助于减轻</td></tr>
+      <tr><td>继续优质脂肪</td><td>牛油果、坚果、橄榄油</td><td>孕酮已开始升高，胆固醇原料持续供应关键 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+    </table>
+
+    <div class="section-title ovulation">三、营养素补充</div>
+    <ul>
+      <li>维持全谱B族+维C+D3+K2+镁+锌+鱼油基础方案</li>
+      <li><strong>DIM（二吲哚甲烷）：</strong>若有乳腺增生/子宫肌瘤，可在卵泡期→排卵期加用，帮助促进4-OH/16-OH雌激素向2-OH健康通路代谢 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>种子循环切换：</strong>排卵日起切换为芝麻籽+葵花籽（各1汤匙/日），支持孕酮合成阶段 <span class="tag tag-medical">种子循环</span></li>
+    </ul>
+
+    <div class="section-title ovulation">四、运动建议</div>
+    <table>
+      <tr><th>运动类型</th><th>推荐</th><th>说明</th></tr>
+      <tr><td>重量训练/爆发力训练</td><td>挑战个人最大重量（PR）；增加跳跃、爆发性动作</td><td>全周期最佳窗口，雌激素+睾酮峰值 <span class="tag tag-medical">HealCycle</span></td></tr>
+      <tr><td>普拉提/核心训练</td><td>30-45分钟</td><td>排卵期身体最稳定，是建立核心稳定性的好时机</td></tr>
+      <tr><td>强度运动后恢复拉伸</td><td>必须</td><td>韧带松弛素高，关节保护最重要</td></tr>
+    </table>
+    <div class="warning-box"><strong>关节风险：</strong>松弛素升高导致韧带更松，深蹲和硬拉需特别注意膝关节和踝关节的对位，技术动作优先于重量突破。<span class="tag tag-medical">医学建议</span></div>
+
+    <div class="section-title ovulation">五、生活方式</div>
+    <ul>
+      <li>适合安排重要谈判、发表、社交活动——各项能力达到顶峰</li>
+      <li><strong>护肤：</strong>皮肤状态极佳，功效护肤继续；注意T区可能轻微出油，温和洁面即可，不要过度清洁</li>
+      <li>若目标是备孕，此为同房黄金期</li>
+    </ul>
+
+    <div class="section-title ovulation">六、注意事项</div>
+    <ul>
+      <li>排卵期大豆制品不宜过量（每日豆制品≤300g），大豆异黄酮过量可能干扰雌激素峰值 <span class="tag tag-medical">医学建议</span></li>
+      <li>即便状态最好，也不要连续几天高强度训练而不休息</li>
+      <li>排卵后（Day 15起）孕酮开始升高，黄体期即将到来，饮食方案可开始向黄体期过渡</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 黄体期 ========== -->
+<section class="phase-section" id="luteal">
+  <div class="phase-header luteal">
+    <div class="phase-icon">🌙</div>
+    <div>
+      <h2>黄体期（经前期）</h2>
+      <div class="days">Day 17–28｜孕酮主导，关键是保孕酮、稳胰岛素、降皮质醇</div>
+    </div>
+  </div>
+  <div class="phase-body">
+
+    <div class="section-title luteal">一、身体与激素变化</div>
+    <div class="hormone-grid">
+      <div class="hormone-card hbg-luteal"><div class="hname">雌激素 E₂</div><span class="hlevel level-falling">先升后降</span></div>
+      <div class="hormone-card hbg-luteal"><div class="hname">孕酮 P</div><span class="hlevel level-high">升高→急降</span></div>
+      <div class="hormone-card hbg-luteal"><div class="hname">FSH</div><span class="hlevel level-low">低</span></div>
+      <div class="hormone-card hbg-luteal"><div class="hname">LH</div><span class="hlevel level-low">低</span></div>
+      <div class="hormone-card hbg-luteal"><div class="hname">睾酮 T</div><span class="hlevel level-falling">逐渐下降</span></div>
+    </div>
+    <ul>
+      <li><strong>代谢：</strong>基础代谢率升高约5-10%，但同时食欲增强、更易嗜甜 <span class="tag tag-medical">Journal of Clinical Endocrinology</span></li>
+      <li><strong>水分：</strong>孕酮促进钠水潴留，体重可波动1-2kg（非真实脂肪增加） <span class="tag tag-medical">医学</span></li>
+      <li><strong>皮肤：</strong>孕酮下降 → 雄激素相对占主导 → 皮脂腺过度活跃 → 经前爆痘（尤以下颌/嘴周） <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>情绪：</strong>焦虑、易怒、情绪敏感；孕酮代谢产物增强GABA，若孕酮充足则有镇静效果；若不足则焦虑加剧 <span class="tag tag-medical">Science Insights</span></li>
+      <li><strong>消化：</strong>孕酮使肠道蠕动减慢，易便秘；肠胃不好的用户此阶段更易出现腹胀不适</li>
+    </ul>
+
+    <div class="section-title luteal">二、三餐饮食建议</div>
+    <div class="info-box">
+      核心原则：<strong>稳血糖（对抗孕酮带来的食欲暴增）+ 充足脂肪（保护孕酮合成）+ 色氨酸+复合碳水（稳定血清素缓解PMS）</strong><br>
+      此阶段控制精制碳水最关键——高胰岛素会截走孕酮原料（胆固醇→优先制造皮质醇），加剧经前痘和情绪波动。<span class="tag tag-blogger">Mr林肤</span>
+    </div>
+    <div class="meal-grid">
+      <div class="meal-card">
+        <h4>早餐</h4>
+        <p>牛油果全麦吐司（2片）+ 水煮蛋2个 + 少量坚果<br><br>或：鸡蛋炒蔬菜（用黄油）+ 南瓜小碗<br><br>避免：白粥+包子（高GI升胰岛素）</p>
+      </div>
+      <div class="meal-card">
+        <h4>午餐</h4>
+        <p>牛肉/三文鱼 100g + 深色蔬菜（西兰花/菠菜，橄榄油炒）+ 荞麦面/杂粮饭少量 + 南瓜籽一把（镁）</p>
+      </div>
+      <div class="meal-card">
+        <h4>晚餐</h4>
+        <p>蒸鳕鱼/鸡腿肉 + 蒸蔬菜 + 小米粥（温热）+ 70%黑巧20g（镁+可可抗氧化，缓解甜食渴望）<br><br>晚餐减少碳水比例</p>
+      </div>
+    </div>
+    <table>
+      <tr><th>黄体期特别食物</th><th>摄入量</th><th>作用</th><th>来源</th></tr>
+      <tr><td>芝麻籽（磨粉）</td><td>1汤匙/日</td><td>木酚素支持孕酮代谢，抑制过多雌激素</td><td><span class="tag tag-both">种子循环</span></td></tr>
+      <tr><td>葵花籽</td><td>1汤匙/日</td><td>维E+硒，支持孕酮合成，抗氧化</td><td><span class="tag tag-both">种子循环</span></td></tr>
+      <tr><td>黑巧克力（70%+）</td><td>20g/日</td><td>镁缓解痉挛和PMS；色氨酸稳定血清素；可可多酚抗炎</td><td><span class="tag tag-medical">医学</span></td></tr>
+      <tr><td>三文鱼/沙丁鱼</td><td>每周≥2次</td><td>Omega-3抑制皮质醇，缓解黄体期炎症</td><td><span class="tag tag-both">博主+医学</span></td></tr>
+      <tr><td>南瓜籽</td><td>一把/日</td><td>镁+锌，抑制5α-还原酶减少DHT，防经前痘</td><td><span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>复合碳水（荞麦/燕麦/糙米）</td><td>适量，以代替白米</td><td>低GI稳血糖，色氨酸前体支持血清素合成</td><td><span class="tag tag-medical">医学</span></td></tr>
+    </table>
+    <div class="warning-box">
+      <strong>经前爆痘专项：</strong>此阶段最容易长痘是孕酮下降+雄激素相对增强的必然结果。饮食上绝对不能喝奶茶/吃甜品（高胰岛素→雄激素↑→皮脂腺过度活跃）。护肤上不要此时引入新功效产品。<span class="tag tag-blogger">Mr林肤</span>
+    </div>
+
+    <div class="section-title luteal">三、营养素补充</div>
+    <table>
+      <tr><th>营养素</th><th>剂量/形式</th><th>黄体期特别说明</th></tr>
+      <tr><td>B5（泛酸）</td><td>500mg额外增加</td><td>孕酮合成的关键原料；高压/高皮质醇会大量消耗B5 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>维生素C</td><td>1-3g（分次，随餐）</td><td>促进孕烯醇酮→孕酮转化；高皮质醇大量消耗 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>镁（甘氨酸镁）</td><td>300-400mg/日，睡前2g</td><td>黄体期最重要的矿物质——缓解PMS/痉挛/焦虑/失眠 <span class="tag tag-both">博主+医学</span></td></tr>
+      <tr><td>B6（P5P）</td><td>活性形式25-50mg/日</td><td>稳定多巴胺/血清素/GABA，直接对抗PMS情绪症状 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>全谱B族</td><td>继续维持</td><td>黄体期肝脏代谢孕酮和雌激素均需B族</td></tr>
+      <tr><td>甘氨酸镁+茶氨酸</td><td>睡前服用</td><td>若PMS导致失眠、焦虑加重，加茶氨酸100-200mg协同 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+      <tr><td>南非醉茄（Ashwagandha）</td><td>300-600mg，早上</td><td>适应原，降低皮质醇，间接保护孕酮 <span class="tag tag-blogger">Mr林肤</span></td></tr>
+    </table>
+
+    <div class="section-title luteal">四、运动建议</div>
+    <table>
+      <tr><th>运动类型</th><th>黄体期前（Day 17-22）</th><th>黄体期后（Day 23-28）</th></tr>
+      <tr><td>力量训练</td><td>可以继续中等强度（70-75% 1RM），适当降低容量</td><td>轻量，以维持肌肉刺激为主，不追求PR</td></tr>
+      <tr><td>有氧</td><td>中等强度有氧：快走、慢跑、游泳，每次30-40分钟</td><td>低强度有氧为主：散步、骑车悠闲节奏</td></tr>
+      <tr><td>瑜伽/普拉提</td><td>可作为辅助</td><td>主要运动方式，缓解PMS效果好</td></tr>
+      <tr><td>HIIT</td><td>减少至每周1次</td><td>避免，孕酮升高时高强度训练更难恢复，皮质醇更易飙升</td></tr>
+    </table>
+    <div class="info-box">
+      <strong>减脂 vs 增肌：</strong>黄体期代谢率略升，但孕酮的分解代谢效应（对蛋白质有一定分解倾向）和恢复能力下降，建议<strong>以维持（不退步）为目标</strong>。保证蛋白质摄入（1.2-1.6g/kg），可以有效对抗肌肉流失。此期体重增加1-2kg是正常水潴留。<br>
+      <strong>注意：</strong>一项2024年发表于《Journal of Physiology》的研究发现，月经周期阶段对肌肉蛋白合成速率无显著影响——即卵泡期和黄体期的肌肉蛋白合成差异并不大。训练一致性比周期安排更重要。<span class="tag tag-medical">Phillips et al., J Physiol 2024</span>
+    </div>
+    <div class="warning-box"><strong>黄体期后段（Day 25-28）警惕黄体破裂：</strong>高强度跳跃、腹部撞击、激烈运动均可能诱发。若下腹部突然剧痛伴头晕，须立即就医。<span class="tag tag-medical">中国体育科学学会</span></div>
+
+    <div class="section-title luteal">五、生活方式</div>
+    <ul>
+      <li><strong>睡眠（最重要）：</strong>黄体期皮质醇-孕酮拮抗最激烈，熬夜=直接损耗孕酮。必须22:00前入睡；睡前镁+茶氨酸；GABA（若大脑特别兴奋）可选用 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>压力管理：</strong>身体在应激时优先合成皮质醇，孕酮被牺牲——慢性压力是经前综合征的主要元凶。冥想、深呼吸、森林散步重建HPA轴节律 <span class="tag tag-blogger">Mr林肤</span></li>
+      <li><strong>社交：</strong>适当减少高耗能社交；此期若感到不想见人，是正常的神经化学变化，顺应而非强迫</li>
+      <li><strong>工作：</strong>安排细节性、整理型工作；避免重要决策/公开演讲（若PMS严重）</li>
+      <li><strong>护肤重点：</strong>
+        <ul>
+          <li>经前痘好发期：绝对不要新增功效产品、不要重度清洁</li>
+          <li>若已有经前痘：温和洁面+修护保湿，可使用含烟酰胺的产品（调节皮脂+抗炎）</li>
+          <li>不要使用高浓度果酸/维A酸（屏障脆弱会加剧红肿）<span class="tag tag-blogger">Mr林肤</span></li>
+          <li>脂肪粒：此期皮肤代谢减慢，脂肪粒不宜强行处理，等卵泡期皮肤状态好时处理更安全</li>
+        </ul>
+      </li>
+    </ul>
+
+    <div class="section-title luteal">六、注意事项</div>
+    <ul>
+      <li><strong>体重波动不是脂肪增加：</strong>黄体期体重增加1-2kg均为水潴留，减少对体重秤的关注</li>
+      <li><strong>食欲增加是正常生理：</strong>代谢率升高5-10%，身体确实需要更多热量，但不是任何热量——应以蛋白质+优质脂肪为主，不是奶茶甜品</li>
+      <li><strong>肠胃问题用户：</strong>黄体期孕酮减慢肠道蠕动，更易便秘腹胀；增加可溶性纤维（魔芋/奇亚籽）、充足饮水、饭后散步</li>
+      <li><strong>易犯错误：</strong>用高糖食物"安慰自己"——这是此期最常见的陷阱，高GI食物会直接加重经前痘和情绪波动</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 冲突对比 ========== -->
+<section class="conflict-section" id="conflict">
+  <div class="conflict-header">
+    <div class="phase-icon">⚖️</div>
+    <div>
+      <h2>博主观点 vs 权威资料：冲突点梳理与判断</h2>
+    </div>
+  </div>
+  <div class="conflict-body">
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突1：种子循环（Seed Cycling）是否有效？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主（间接支持）：</strong>Mr林肤未直接提倡种子循环，但其理论（南瓜籽油抑制DHT、B5/维C支持孕酮）与种子循环的营养逻辑方向一致。
+        </div>
+        <div class="view-b">
+          <strong>医学证据现状：</strong>Medical News Today、Healthline 等权威来源指出：目前高质量随机对照研究极少。2023年一项对PCOS女性的研究（PMC，n=90）显示种子循环组在激素和排卵指标上有所改善；Loma Linda大学正在进行一项50人临床试验（预计2026年出结果）。种子本身营养价值无疑，但"精确时机调激素"的机制证据尚不充分。
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>种子循环安全性高、营养价值确定（Omega-3/锌/维E/木酚素均为优质营养素），即便调激素效果有限，将其纳入饮食亦无害。对于经前痘、PMS明显的用户，可作为低风险的辅助策略尝试3个月观察反应。不以此作为替代医疗的根据。
+        </div>
+      </div>
+    </div>
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突2：卵泡期是增肌"黄金期"吗？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主（间接支持）：</strong>博主未直接讨论增肌周期，但其核心逻辑（雌激素→胰岛素敏感性↑→合成代谢改善）支持卵泡期训练效果更好。
+        </div>
+        <div class="view-b">
+          <strong>医学证据（存在分歧）：</strong>
+          <ul>
+            <li>Sports Medicine（2022）研究发现，卵泡期力量训练在肌肉力量和体积增益上优于黄体期力量训练（基于多项研究综述）。</li>
+            <li>但Journal of Physiology（2024）的严格双盲试验（n=12，直接测量肌蛋白合成速率）发现：月经周期阶段对肌肉蛋白合成速率无显著影响，卵泡期≈黄体期。</li>
+            <li>Frontiers in Sports（2025）质性研究也指出：个体差异极大，不能推荐统一的周期性训练方案。</li>
+          </ul>
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>大概率是"主观感受上卵泡期更适合高强度训练"是真实的（雌激素确实提升精力、关节润滑、恢复速度），但"肌肉蛋白合成在分子层面有差异"尚未被证实。实践建议：在卵泡期/排卵期进行渐进性超负荷（重量+容量推进），在黄体期维持训练质量即可，不必刻意减量——训练一致性比周期安排更关键。
+        </div>
+      </div>
+    </div>
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突3：优质饱和脂肪（猪油/黄油）是否应大量摄入？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主：</strong>强烈提倡每日脂肪≥总能量25%，以猪油、黄油、椰子油、橄榄油为主；明确批评大豆油/玉米油（高ω-6易氧化）。理论基础：胆固醇是所有性激素原料，低脂=低雌激素/孕酮。
+        </div>
+        <div class="view-b">
+          <strong>主流医学（如哈佛公共卫生学院、AAD）：</strong>支持增加单不饱和脂肪（橄榄油、牛油果）和多不饱和ω-3（深海鱼、亚麻籽）；对饱和脂肪（猪油、黄油、椰子油）有所限制，尤其担心心血管风险。但近年多项研究重新评估天然饱和脂肪，认为加工碳水化合物比天然饱和脂肪的代谢危害更大。
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>双方均同意"充足脂肪摄入"和"避免高ω-6精炼植物油"的核心方向是对的。分歧在饱和脂肪（黄油/猪油）上。折中方案：以橄榄油、牛油果油、山茶油为主要食用油（单不饱和脂肪，博主和医学双认可）；黄油/猪油适量使用（不完全排除）；减少大豆油/玉米油是共识。控碳水比高脂本身更关键——博主核心观点有坚实基础。
+        </div>
+      </div>
+    </div>
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突4：经前痘只与孕酮/雄激素有关，和护肤品无关？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主：</strong>经前痘根源是孕酮下降→雄激素相对增强→皮脂腺过度活跃，属于内分泌问题，不是护肤品解决的范畴。停洗面奶+修复屏障是关键。
+        </div>
+        <div class="view-b">
+          <strong>皮肤科学（AAD等）：</strong>经前爆痘确实有激素驱动成分，但局部外用壬二酸、烟酰胺、低浓度水杨酸也有一定效果；完全不洗脸可能导致毛孔堵塞。不少皮肤科建议"温和清洁+轻度控油"，而非停止洁面。
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>博主理论正确但略微绝对化。实践建议：若皮肤屏障受损（泛红、紧绷、刺激感强），停洗面奶换清水确实有效（博主本人亲测）。若皮肤屏障健康，使用温和氨基酸洁面即可，不必完全停。重要的是"不过度清洁"而非"完全不清洁"。经前痘的内因（胰岛素+孕酮+雄激素）才是根本，外用只是辅助。
+        </div>
+      </div>
+    </div>
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突5：黄体期适合减脂还是增肌？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主（间接）：</strong>强调黄体期需要保孕酮，不建议过度运动和严格限热量，因为"身体会优先合成皮质醇，孕酮被牺牲"。
+        </div>
+        <div class="view-b">
+          <strong>部分网络建议（中文内容）：</strong>认为黄体期代谢率高5-10%，适合"增加训练量促进燃脂"。
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>博主逻辑更合理。黄体期确实代谢率略高，但同时：孕酮促合成皮质醇、恢复能力下降、情绪和睡眠更脆弱。此时大幅增加训练量或过度节食，反而会加重皮质醇，进一步损耗孕酮，形成经前综合征恶性循环。黄体期的核心目标应是"维持+保孕酮+降皮质醇"，不是激进减脂或增肌。
+        </div>
+      </div>
+    </div>
+
+    <div class="conflict-item">
+      <div class="conflict-topic">冲突6：肠胃不吸收怎么补营养素？</div>
+      <div class="conflict-content">
+        <div class="view-a">
+          <strong>博主建议：</strong>对于肠胃差/吸收不良人群，推荐补充甜菜碱盐酸盐（Betaine HCl）促进胃酸分泌；避免一次性服用大量营养素；减少高纤维蔬菜和粗粮（肠道菌群失衡时会加重有害菌）；骨头汤补胶原蛋白和氨基酸。
+        </div>
+        <div class="view-b">
+          <strong>医学观点：</strong>Betaine HCl对功能性胃酸不足有一定支持证据，但不建议有胃溃疡、GERD患者使用。减少高纤维对于SIBO（小肠细菌过度增殖）患者是合理的，但对于普通肠胃敏感人群，适量可溶性纤维（非不溶性）有益。
+        </div>
+        <div class="verdict">
+          <strong>结论：</strong>博主的具体建议（HCl、减少粗粮）适合特定肠胃问题人群，但需要先判断具体原因（是胃酸不足？SIBO？肠漏？）。对于"肠胃不好不吸收"的通用建议：所有营养素随餐服用、选择高吸收率形式（螯合矿物质、活性B族）、少量多次是较安全的起点。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 免责声明 -->
+<div class="disclaimer">
+  <strong>声明：本文不构成任何医疗建议。</strong><br>
+  以上内容综合整理自小红书博主"Mr林肤学笔记"内容及Cleveland Clinic、Science News Today、Medical News Today、Healthline、Journal of Physiology（Phillips et al. 2024）、Sports Medicine（Kissow et al. 2022）、Food Science & Nutrition（PMC 2023）等公开资料，仅供健康参考。<br>
+  若您有月经异常、多囊卵巢综合征、内分泌疾病或其他健康问题，请咨询妇科或内分泌科医生。补充营养素前建议进行相关血液检测（铁蛋白、25(OH)D、空腹胰岛素等）以确认个人需求。
+</div>
+
+</div><!-- /container -->
+
+</body>
+</html>
