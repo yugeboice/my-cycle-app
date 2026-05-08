@@ -237,61 +237,30 @@ ul{padding-left:18px}li{margin:3px 0;font-size:13px}
 <div class="card">
 <h2>30天周期日历（5/5-6/3）</h2>
 <div class="phase-legend"><span style="background:#ffe0e0">月经期</span><span style="background:#e0f7e0">卵泡期</span><span style="background:#fff3e0">排卵期</span><span style="background:#f3e0ff">黄体早</span><span style="background:#e8d5f5">黄体晚</span></div>
-<div class="cal">
+<div class="cal" id="cycle-calendar">
 <div class="cal-h">一</div><div class="cal-h">二</div><div class="cal-h">三</div><div class="cal-h">四</div><div class="cal-h">五</div><div class="cal-h">六</div><div class="cal-h">日</div>
-<div class="cal-d men"><div class="dt">5</div><div class="inf">D1经期</div></div><div class="cal-d men"><div class="dt">6</div><div class="inf">D2</div></div><div class="cal-d men today"><div class="dt">7</div><div class="inf">D3今天</div></div><div class="cal-d men"><div class="dt">8</div><div class="inf">D4</div></div><div class="cal-d men"><div class="dt">9</div><div class="inf">D5</div></div><div class="cal-d men"><div class="dt">10</div><div class="inf">D6</div></div><div class="cal-d men"><div class="dt">11</div><div class="inf">D7末</div></div>
-<div class="cal-d fol"><div class="dt">12</div><div class="inf">D8卵泡</div></div><div class="cal-d fol"><div class="dt">13</div><div class="inf">D9</div></div><div class="cal-d fol"><div class="dt">14</div><div class="inf">D10</div></div><div class="cal-d fol"><div class="dt">15</div><div class="inf">D11</div></div><div class="cal-d fol"><div class="dt">16</div><div class="inf">D12</div></div><div class="cal-d fol"><div class="dt">17</div><div class="inf">D13</div></div><div class="cal-d ovu"><div class="dt">18</div><div class="inf">D14排卵</div></div>
-<div class="cal-d ovu"><div class="dt">19</div><div class="inf">D15</div></div><div class="cal-d ovu"><div class="dt">20</div><div class="inf">D16</div></div><div class="cal-d lut"><div class="dt">21</div><div class="inf">D17黄体</div></div><div class="cal-d lut"><div class="dt">22</div><div class="inf">D18</div></div><div class="cal-d lut"><div class="dt">23</div><div class="inf">D19</div></div><div class="cal-d lut"><div class="dt">24</div><div class="inf">D20</div></div><div class="cal-d lut"><div class="dt">25</div><div class="inf">D21</div></div>
-<div class="cal-d lut"><div class="dt">26</div><div class="inf">D22</div></div><div class="cal-d lut"><div class="dt">27</div><div class="inf">D23</div></div><div class="cal-d lut2"><div class="dt">28</div><div class="inf">D24晚黄体</div></div><div class="cal-d lut2"><div class="dt">29</div><div class="inf">D25</div></div><div class="cal-d lut2"><div class="dt">30</div><div class="inf">D26</div></div><div class="cal-d lut2"><div class="dt">31</div><div class="inf">D27</div></div><div class="cal-d lut2"><div class="dt">6/1</div><div class="inf">D28</div></div>
-<div class="cal-d lut2"><div class="dt">6/2</div><div class="inf">D29</div></div><div class="cal-d lut2"><div class="dt">6/3</div><div class="inf">D30</div></div><div class="cal-d men"><div class="dt">6/4</div><div class="inf">下次经期</div></div><div class="cal-d empty"></div><div class="cal-d empty"></div><div class="cal-d empty"></div><div class="cal-d empty"></div>
+<!-- 5/5是周二，前面补1个空格 -->
+<div class="cal-d empty"></div>
+<div class="cal-d men" data-day="1" onclick="showDay(1)"><div class="dt">5</div><div class="inf">D1经期</div></div><div class="cal-d men" data-day="2" onclick="showDay(2)"><div class="dt">6</div><div class="inf">D2</div></div><div class="cal-d men" data-day="3" onclick="showDay(3)"><div class="dt">7</div><div class="inf">D3</div></div><div class="cal-d men" data-day="4" onclick="showDay(4)"><div class="dt">8</div><div class="inf">D4</div></div><div class="cal-d men" data-day="5" onclick="showDay(5)"><div class="dt">9</div><div class="inf">D5</div></div><div class="cal-d men" data-day="6" onclick="showDay(6)"><div class="dt">10</div><div class="inf">D6</div></div>
+<div class="cal-d men" data-day="7" onclick="showDay(7)"><div class="dt">11</div><div class="inf">D7末</div></div><div class="cal-d fol" data-day="8" onclick="showDay(8)"><div class="dt">12</div><div class="inf">D8卵泡</div></div><div class="cal-d fol" data-day="9" onclick="showDay(9)"><div class="dt">13</div><div class="inf">D9</div></div><div class="cal-d fol" data-day="10" onclick="showDay(10)"><div class="dt">14</div><div class="inf">D10</div></div><div class="cal-d fol" data-day="11" onclick="showDay(11)"><div class="dt">15</div><div class="inf">D11</div></div><div class="cal-d fol" data-day="12" onclick="showDay(12)"><div class="dt">16</div><div class="inf">D12</div></div><div class="cal-d fol" data-day="13" onclick="showDay(13)"><div class="dt">17</div><div class="inf">D13</div></div>
+<div class="cal-d ovu" data-day="14" onclick="showDay(14)"><div class="dt">18</div><div class="inf">D14排卵</div></div><div class="cal-d ovu" data-day="15" onclick="showDay(15)"><div class="dt">19</div><div class="inf">D15</div></div><div class="cal-d ovu" data-day="16" onclick="showDay(16)"><div class="dt">20</div><div class="inf">D16</div></div><div class="cal-d lut" data-day="17" onclick="showDay(17)"><div class="dt">21</div><div class="inf">D17黄体</div></div><div class="cal-d lut" data-day="18" onclick="showDay(18)"><div class="dt">22</div><div class="inf">D18</div></div><div class="cal-d lut" data-day="19" onclick="showDay(19)"><div class="dt">23</div><div class="inf">D19</div></div><div class="cal-d lut" data-day="20" onclick="showDay(20)"><div class="dt">24</div><div class="inf">D20</div></div>
+<div class="cal-d lut" data-day="21" onclick="showDay(21)"><div class="dt">25</div><div class="inf">D21</div></div><div class="cal-d lut" data-day="22" onclick="showDay(22)"><div class="dt">26</div><div class="inf">D22</div></div><div class="cal-d lut" data-day="23" onclick="showDay(23)"><div class="dt">27</div><div class="inf">D23</div></div><div class="cal-d lut2" data-day="24" onclick="showDay(24)"><div class="dt">28</div><div class="inf">D24晚黄体</div></div><div class="cal-d lut2" data-day="25" onclick="showDay(25)"><div class="dt">29</div><div class="inf">D25</div></div><div class="cal-d lut2" data-day="26" onclick="showDay(26)"><div class="dt">30</div><div class="inf">D26</div></div><div class="cal-d lut2" data-day="27" onclick="showDay(27)"><div class="dt">31</div><div class="inf">D27</div></div>
+<div class="cal-d lut2" data-day="28" onclick="showDay(28)"><div class="dt">6/1</div><div class="inf">D28</div></div><div class="cal-d lut2" data-day="29" onclick="showDay(29)"><div class="dt">6/2</div><div class="inf">D29</div></div><div class="cal-d lut2" data-day="30" onclick="showDay(30)"><div class="dt">6/3</div><div class="inf">D30</div></div><div class="cal-d men"><div class="dt">6/4</div><div class="inf">下次经期</div></div><div class="cal-d empty"></div><div class="cal-d empty"></div><div class="cal-d empty"></div>
+</div>
+<p class="note" style="margin-top:8px">点击日期查看当天计划</p>
+</div>
+
+<!-- 日详情弹窗 -->
+<div id="day-popup" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="background:#fff;border-radius:14px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;padding:20px;margin:auto;position:relative">
+<button onclick="document.getElementById('day-popup').style.display='none'" style="position:absolute;top:10px;right:14px;border:none;background:none;font-size:20px;cursor:pointer;color:#999">&times;</button>
+<div id="day-popup-content"></div>
 </div>
 </div>
 
-<!-- ===== 今日速查 ===== -->
-<div class="today-card">
-  <div class="tc-title">
-    今日速查 — 5月7日
-    <span class="tc-badge">Day 3 月经期</span>
-  </div>
-
-  <div class="today-grid">
-    <!-- 今日饮食 -->
-    <div class="today-block" style="grid-column:1/-1">
-      <h4>今日饮食重点</h4>
-      <table class="today-meals">
-        <tr><td>早餐</td><td>红枣姜茶 + 水煮蛋2个 + 亚麻籽粉1勺 + 黑芝麻</td></tr>
-        <tr><td>午餐</td><td>五香猪肝80g + 菠菜汤 + 南瓜块</td></tr>
-        <tr><td>晚餐</td><td>清炖牛腱肉80g + 荞麦面60g + 焯菠菜</td></tr>
-        <tr><td>下午茶</td><td>猕猴桃1个 + 核桃5颗</td></tr>
-      </table>
-    </div>
-
-    <!-- 今日补剂 -->
-    <div class="today-block">
-      <h4>今日补剂</h4>
-      <div class="supp-pills">
-        <span class="supp-pill">女性多维 <span class="pill-time">早餐</span></span>
-        <span class="supp-pill">铁+维C泡腾片 <span class="pill-time">午餐后</span></span>
-        <span class="supp-pill">镁 <span class="pill-time">睡前</span></span>
-      </div>
-    </div>
-
-    <!-- 阶段重点 -->
-    <div class="today-block">
-      <h4>当前阶段重点</h4>
-      <ul class="focus-list">
-        <li>补铁 · 温热饮食</li>
-        <li>轻柔运动</li>
-        <li>早睡</li>
-        <li>停用酸类护肤品</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="warn-box">
-    <b>注意：</b>避免冷饮、咖啡、辛辣食物；铁和镁分开至少2小时服用
-  </div>
-</div>
+<!-- ===== 今日速查（动态） ===== -->
+<div class="today-card" id="today-card-dynamic"></div>
+<!-- 旧的硬编码今日速查已移除，由JS动态生成 -->
 
 </div>
 </div>
@@ -700,6 +669,148 @@ function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('overlay').classList.toggle('open');
 }
+
+// ===== 周期数据 =====
+var CYCLE_START = new Date(2026, 4, 5); // 5月5日
+var CYCLE_LEN = 30;
+var WEEKDAYS = ['日','一','二','三','四','五','六'];
+
+var PHASE_DATA = {
+  men: {name:'月经期', color:'#c0392b', supp:'女性多维(早餐) + 铁+维C泡腾片(午餐后) + 镁(睡前)', focus:'补铁·温热饮食·轻柔运动·早睡·停用酸类护肤品', warn:'避免冷饮、咖啡、辛辣；铁和镁分开2小时'},
+  fol: {name:'卵泡期', color:'#27ae60', supp:'女性多维(早餐) + 鱼油(午餐) + 甘氨酸锌(晚餐)', focus:'高蛋白增肌·力量训练·葡萄籽恢复·能量最强', warn:'趁能量好储备体能，不要放松饮食控制'},
+  ovu: {name:'排卵期', color:'#e67e22', supp:'女性多维(早餐) + 鱼油(午餐) + 葡萄籽(空腹)', focus:'峰值爆发力·十字花科蔬菜·注意韧带', warn:'韧带较松，运动充分热身'},
+  lut: {name:'黄体早期', color:'#8e44ad', supp:'女性多维(早餐) + 鱼油(午餐) + 镁(睡前)', focus:'控糖防痘·补镁·维持运动·早睡', warn:'开始严格控糖！减少碳水，增加脂肪蛋白'},
+  lut2:{name:'黄体晚期', color:'#6c3483', supp:'女性多维(早餐) + 鱼油(午餐) + 镁(睡前)', focus:'防痘决战·绝对控糖·阿达帕林·11点前睡', warn:'禁奶茶甜品炸鸡！坚持阿达帕林每晚用'}
+};
+
+// 每天的饮食数据 (Day 1-30)
+var MEALS = {
+  1:{b:'红枣姜茶+煮蛋2个+亚麻籽粉',l:'猪肝+菠菜汤+南瓜',d:'牛腱肉+荞麦面+菠菜',t:'猕猴桃+核桃'},
+  2:{b:'南瓜块+煎蛋2个+姜茶+黑芝麻',l:'牛腱肉+菠菜+南瓜',d:'三文鱼+荞麦面+蛋花汤',t:'猕猴桃+核桃'},
+  3:{b:'红枣姜茶+煮蛋2个+亚麻籽粉+黑芝麻',l:'五香猪肝+菠菜汤+南瓜块',d:'牛腱肉+荞麦面+菠菜',t:'猕猴桃+核桃'},
+  4:{b:'南瓜块+煎蛋2个+姜茶+黑芝麻',l:'牛腱肉+菠菜+南瓜',d:'三文鱼+荞麦面+蛋花汤',t:'猕猴桃+核桃'},
+  5:{b:'红枣姜茶+煎蛋2个+亚麻籽粉',l:'猪肝+三文鱼拌荞麦面',d:'牛腱肉汤+菠菜+南瓜',t:'猕猴桃+核桃'},
+  6:{b:'椰奶亚麻籽粉+煎蛋2个',l:'番茄蛋汤+糙米+南瓜蒸块',d:'白灼大虾+小白菜+糙米',t:'苹果+杏仁'},
+  7:{b:'南瓜粥(椰奶版)+煎蛋2个',l:'鸡胸+小白菜+糙米',d:'番茄豆腐汤+虾仁炒蛋',t:'苹果+杏仁'},
+  8:{b:'椰奶黑豆浆+煮蛋2个',l:'鸡胸+番茄+糙米',d:'豆腐虾仁煲+南瓜',t:'苹果+杏仁'},
+  9:{b:'牛油果煎蛋+亚麻籽粉',l:'煎三文鱼+藜麦+西兰花',d:'煎牛排+芦笋',t:'蓝莓+南瓜籽'},
+  10:{b:'牛油果蛋杯+南瓜籽+黑芝麻',l:'三文鱼藜麦碗+西兰花',d:'牛排+鹰嘴豆沙拉',t:'蓝莓+南瓜籽'},
+  11:{b:'煎蛋2个+南瓜籽+椰奶',l:'芦笋鸡胸(外食)',d:'三文鱼+鹰嘴豆+藜麦',t:'蓝莓+南瓜籽'},
+  12:{b:'奇亚籽椰奶布丁+煎蛋2个',l:'鸡腿+紫甘蓝+糙米',d:'清蒸鳕鱼+秋葵+蘑菇汤',t:'橙子+腰果'},
+  13:{b:'鸡蛋2个+胡萝卜+亚麻籽粉+黑芝麻',l:'椰奶鸡腿咖喱+糙米',d:'蒜蓉大虾+紫甘蓝+蘑菇',t:'橙子+腰果'},
+  14:{b:'奇亚籽碗+煎蛋+南瓜籽',l:'蘑菇鸡肉饭+秋葵',d:'大虾+鳕鱼汤+蔬菜',t:'橙子+腰果'},
+  15:{b:'煎蛋2个+山药泥+亚麻籽粉+黑芝麻',l:'三文鱼+菠菜+荞麦面',d:'羊肉片汤+黑木耳+山药',t:'香蕉半根+腰果+黑巧'},
+  16:{b:'椰奶姜黄拿铁+煎蛋2个+腰果',l:'羊肉菠菜汤+荞麦面+黑豆',d:'三文鱼+山药',t:'香蕉半根+腰果+黑巧'},
+  17:{b:'鸡蛋2个+腰果+黑巧+黑芝麻',l:'三文鱼饭团+黑豆',d:'羊肉汤面+菠菜',t:'香蕉半根+腰果'},
+  18:{b:'牛油果煎蛋2个+亚麻籽粉',l:'鸡胸+南瓜+少量糙米',d:'清蒸鳕鱼+深绿叶菜',t:'蓝莓+核桃'},
+  19:{b:'南瓜椰奶粥+煎蛋2个+核桃',l:'鸡胸鹰嘴豆沙拉+牛油果',d:'鳕鱼+深绿叶菜+少量糙米',t:'蓝莓+核桃'},
+  20:{b:'椰奶亚麻籽碗+煎蛋+黑芝麻',l:'南瓜鸡肉+鹰嘴豆饭',d:'鳕鱼汤+绿叶菜',t:'蓝莓+核桃'},
+  21:{b:'南瓜块+煎蛋2个+亚麻籽粉+黑芝麻',l:'牛腱肉+西兰花+荞麦面',d:'大虾蘑菇汤+南瓜',t:'苹果+南瓜籽'},
+  22:{b:'蘑菇炒蛋2个+南瓜块',l:'牛肉丝+洋葱+西兰花+荞麦面',d:'大虾+蘑菇蔬菜汤',t:'苹果+南瓜籽'},
+  23:{b:'煎蛋2个+椰奶+黑芝麻',l:'牛肉+南瓜+西兰花(带饭)',d:'洋葱虾仁+荞麦面',t:'苹果+南瓜籽'},
+  24:{b:'牛油果煎蛋2个+亚麻籽粉+黑芝麻',l:'三文鱼+菠菜+荞麦面',d:'鸡腿+山药汤',t:'蓝莓+腰果+黑巧'},
+  25:{b:'椰奶姜黄拿铁+煎蛋2个+腰果',l:'鸡腿+牛油果+鹰嘴豆菠菜沙拉',d:'三文鱼+山药+荞麦面',t:'蓝莓+腰果+黑巧'},
+  26:{b:'煎蛋2个+黑巧2块+腰果+黑芝麻',l:'外食选蛋白+蔬菜',d:'三文鱼菠菜汤+山药',t:'蓝莓+腰果'},
+  27:{b:'红枣姜茶+煎蛋2个+南瓜+黑芝麻',l:'番茄牛肉汤+糙米',d:'猪肝小白菜汤+糙米+黑豆',t:'猕猴桃+核桃'},
+  28:{b:'椰奶亚麻籽碗+煎蛋2个',l:'牛肉+南瓜+小白菜',d:'清蒸鳕鱼+番茄蛋汤+糙米',t:'猕猴桃+核桃'},
+  29:{b:'红枣姜茶+煎蛋2个+南瓜+黑芝麻',l:'猪肝+番茄+糙米+黑豆',d:'鳕鱼汤+小白菜+糙米',t:'猕猴桃+核桃'},
+  30:{b:'红枣姜茶+煎蛋2个',l:'牛肉+蔬菜+黑豆',d:'温食汤面+鳕鱼',t:'猕猴桃+核桃'}
+};
+
+function getPhase(day) {
+  if (day <= 7) return 'men';
+  if (day <= 13) return 'fol';
+  if (day <= 16) return 'ovu';
+  if (day <= 23) return 'lut';
+  return 'lut2';
+}
+
+function getCycleDay() {
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  var start = new Date(CYCLE_START);
+  start.setHours(0,0,0,0);
+  var diff = Math.floor((today - start) / 86400000) + 1;
+  if (diff < 1 || diff > CYCLE_LEN) return null;
+  return diff;
+}
+
+function renderTodayCard(day) {
+  var card = document.getElementById('today-card-dynamic');
+  if (!day || !MEALS[day]) { card.style.display='none'; return; }
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var m = MEALS[day];
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var dateStr = (dateObj.getMonth()+1) + '月' + dateObj.getDate() + '日 周' + WEEKDAYS[dateObj.getDay()];
+
+  card.innerHTML = '<div class="tc-title">今日速查 — ' + dateStr +
+    ' <span class="tc-badge" style="background:'+pd.color+'">Day '+day+' '+pd.name+'</span></div>' +
+    '<div class="today-grid">' +
+    '<div class="today-block" style="grid-column:1/-1"><h4>今日饮食</h4>' +
+    '<table class="today-meals"><tr><td>早餐</td><td>'+m.b+'</td></tr>' +
+    '<tr><td>午餐</td><td>'+m.l+'</td></tr>' +
+    '<tr><td>晚餐</td><td>'+m.d+'</td></tr>' +
+    '<tr><td>下午茶</td><td>'+m.t+'</td></tr></table></div>' +
+    '<div class="today-block"><h4>今日补剂</h4><div class="supp-pills">' + pd.supp.split('+').map(function(s){return '<span class="supp-pill">'+s.trim()+'</span>'}).join('') + '</div></div>' +
+    '<div class="today-block"><h4>阶段重点</h4><ul class="focus-list">' + pd.focus.split('·').map(function(s){return '<li>'+s.trim()+'</li>'}).join('') + '</ul></div></div>' +
+    '<div class="warn-box"><b>注意：</b>' + pd.warn + '</div>';
+  card.style.display = 'block';
+}
+
+function showDay(day) {
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var m = MEALS[day] || {b:'-',l:'-',d:'-',t:'-'};
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate() + ' 周' + WEEKDAYS[dateObj.getDay()];
+
+  var popup = document.getElementById('day-popup');
+  document.getElementById('day-popup-content').innerHTML =
+    '<h3 style="color:'+pd.color+';margin-bottom:12px">'+dateStr+' · Day '+day+' '+pd.name+'</h3>' +
+    '<h4 style="font-size:13px;color:#888;margin:10px 0 6px">饮食计划</h4>' +
+    '<table style="font-size:13px"><tr><td style="font-weight:600;color:'+pd.color+';width:60px">早餐</td><td>'+m.b+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">午餐</td><td>'+m.l+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">晚餐</td><td>'+m.d+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">下午茶</td><td>'+m.t+'</td></tr></table>' +
+    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">补剂</h4><p style="font-size:13px">'+pd.supp+'</p>' +
+    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">重点</h4><p style="font-size:13px">'+pd.focus+'</p>' +
+    '<div class="warn-box" style="margin-top:12px"><b>注意：</b>'+pd.warn+'</div>';
+  popup.style.display = 'flex';
+}
+
+// 页面加载时：高亮今天 + 渲染今日速查 + 更新标题
+(function(){
+  var day = getCycleDay();
+  if (!day) return;
+
+  // 高亮日历中的今天
+  document.querySelectorAll('.cal-d[data-day]').forEach(function(el){
+    el.classList.remove('today');
+    if (parseInt(el.getAttribute('data-day')) === day) {
+      el.classList.add('today');
+      el.querySelector('.inf').textContent = 'D'+day+' 今天';
+    }
+  });
+
+  // 渲染今日速查卡片
+  renderTodayCard(day);
+
+  // 更新hero badge
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var badges = document.querySelectorAll('.badge');
+  badges.forEach(function(b){ b.textContent = '今天 Day '+day+' '+pd.name; });
+
+  // 更新subtitle
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var heroP = document.querySelector('.hero-bar p');
+  if(heroP) heroP.textContent = '经期5月5日 · 周期30天 · 今天Day'+day+' '+pd.name+' · 无乳制品 · 肠胃敏感';
+})();
+
 </script>
 </body>
 </html>
