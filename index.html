@@ -123,8 +123,10 @@ body.mobile-mode .phase-legend{font-size:10px;gap:4px}
 body.mobile-mode .phase-legend span{padding:2px 6px}
 
 /* 底部导航移动端加大 */
-body.mobile-mode .bottom-nav .bn-item{padding:8px 2px;font-size:10px}
-body.mobile-mode .bottom-nav .bn-item .bn-icon{font-size:20px}
+body.mobile-mode .bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#2c1810;z-index:500;padding:4px 0 env(safe-area-inset-bottom,8px);box-shadow:0 -2px 12px rgba(0,0,0,.2)}
+body.mobile-mode .bottom-nav .bn-item{padding:10px 2px;font-size:11px;gap:3px}
+body.mobile-mode .bottom-nav .bn-item .bn-icon{font-size:22px}
+body.mobile-mode .main{padding-bottom:80px}
 
 /* tag */
 body.mobile-mode .tag{font-size:9px;padding:1px 5px}
