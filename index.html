@@ -135,6 +135,10 @@ ul{padding-left:18px}li{margin:3px 0;font-size:13px}
 .supp-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .supp-pill{display:inline-flex;align-items:center;gap:4px;background:#fff5f5;border:1px solid #ffb3b3;border-radius:20px;padding:3px 10px;font-size:11.5px;color:#c0392b}
 .supp-pill .pill-time{color:#888;font-size:10px}
+.supp-detail{display:flex;flex-direction:column;gap:6px}
+.supp-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:#fff5f5;border-radius:8px;font-size:12px;flex-wrap:wrap}
+.supp-name{font-weight:600;color:#c0392b;flex:1;min-width:120px}
+.supp-time{color:#666;font-size:11px;background:#f0f0f0;padding:1px 8px;border-radius:10px}
 .focus-list{list-style:none;padding:0;margin:0}
 .focus-list li{font-size:12.5px;padding:3px 0;border-bottom:1px solid #f5eded;display:flex;align-items:center;gap:6px}
 .focus-list li:last-child{border-bottom:none}
@@ -250,13 +254,7 @@ ul{padding-left:18px}li{margin:3px 0;font-size:13px}
 <p class="note" style="margin-top:8px">点击日期查看当天计划</p>
 </div>
 
-<!-- 日详情弹窗 -->
-<div id="day-popup" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
-<div style="background:#fff;border-radius:14px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;padding:20px;margin:auto;position:relative">
-<button onclick="document.getElementById('day-popup').style.display='none'" style="position:absolute;top:10px;right:14px;border:none;background:none;font-size:20px;cursor:pointer;color:#999">&times;</button>
-<div id="day-popup-content"></div>
-</div>
-</div>
+<!-- 日详情在today-card-dynamic中展示 -->
 
 <!-- ===== 今日速查（动态） ===== -->
 <div class="today-card" id="today-card-dynamic"></div>
@@ -547,59 +545,65 @@ ul{padding-left:18px}li{margin:3px 0;font-size:13px}
 </div>
 
 <div class="supp-card fol">
-<h4>卵泡期 D8-13（5/12-5/17）· 每天4种（锌隔天）</h4>
+<h4>卵泡期 D8-13（5/12-5/17）</h4>
 <div class="table-wrap">
 <table>
 <tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
 <tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B族催化线粒体产能，缓解犯困</td></tr>
 <tr><td><b>D3+K2</b> <span class="tag t-ir">新买</span> + <b>鱼油</b> <span class="tag t-om">已有</span></td><td>D3 2000IU+K2 + 鱼油1粒</td><td>午餐随餐</td><td>D3K2全周期服用；鱼油抗炎+改善肠道</td></tr>
-<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg <b>隔天吃</b>（≈日均15mg）</td><td>晚餐随餐</td><td>修复肠道+抗炎+调节皮脂腺+支持卵泡发育。隔天吃避免过量和铜锌失衡</td></tr>
-<tr><td colspan="4" class="note">葡萄籽恢复服用（空腹/两餐间，算食补不算补剂）</td></tr>
+<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>两餐间空腹</td><td>抗氧化+护肤。月经期暂停后恢复</td></tr>
+<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg</td><td>晚餐随餐</td><td>修复肠道+调节皮脂腺+支持卵泡发育</td></tr>
 </table>
 </div>
-<p class="why">能量恢复期，身体吸收最好。锌隔天30mg=日均15mg，在安全范围内且吸收效率更高。</p>
+<div class="info-box"><b>锌吃的天：</b>D8(5/12)、D10(5/14)、D12(5/16) 吃 ｜ D9、D11、D13 不吃</div>
+<p class="why">能量恢复期，身体吸收最好。锌隔天30mg=日均15mg，避免过量+铜锌失衡。</p>
 </div>
 
 <div class="supp-card ovu">
-<h4>排卵期 D14-16（5/18-5/20）· 每天4种（锌隔天）</h4>
+<h4>排卵期 D14-16（5/18-5/20）</h4>
 <div class="table-wrap">
 <table>
 <tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
 <tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>维持高代谢支持</td></tr>
 <tr><td><b>D3+K2</b> <span class="tag t-ir">新买</span> + <b>鱼油</b> <span class="tag t-om">已有</span></td><td>D3 2000IU+K2 + 鱼油1粒</td><td>午餐随餐</td><td>抗炎+支持排卵后黄体形成</td></tr>
-<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>空腹/两餐间</td><td>抗氧化保护卵子质量</td></tr>
-<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg <b>隔天吃</b></td><td>晚餐随餐</td><td>支持排卵质量+调节皮脂</td></tr>
+<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>两餐间空腹</td><td>抗氧化保护卵子质量</td></tr>
+<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg</td><td>晚餐随餐</td><td>支持排卵质量+调节皮脂</td></tr>
 </table>
 </div>
-<p class="why">身体最佳状态。锌继续隔天服用，全周期维持（卵泡期+排卵期+黄体期均服用）。</p>
+<div class="info-box"><b>锌吃的天：</b>D14(5/18)、D16(5/20) 吃 ｜ D15(5/19) 不吃</div>
+<p class="why">身体最佳状态。锌+葡萄籽+D3K2全面支持。</p>
 </div>
 
 <div class="supp-card lut">
-<h4>黄体早期 D17-23（5/21-5/27）· 每天4种（锌隔天）</h4>
+<h4>黄体早期 D17-23（5/21-5/27）</h4>
 <div class="table-wrap">
 <table>
 <tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
 <tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B5含量69mg支持孕酮合成</td></tr>
 <tr><td><b>D3+K2</b> <span class="tag t-ir">新买</span> + <b>鱼油</b> <span class="tag t-om">已有</span></td><td>D3 2000IU+K2 + 鱼油1粒</td><td>午餐随餐</td><td>Omega-3抗炎经前防痘；D3支持免疫</td></tr>
-<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg <b>隔天吃</b></td><td>晚餐随餐</td><td>抑制5α-还原酶减少DHT→防经前痘</td></tr>
-<tr><td><b>镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>稳情绪+助眠+降皮质醇→保护孕酮</td></tr>
+<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>两餐间空腹</td><td>抗氧化+抗炎，黄体期持续服用</td></tr>
+<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg</td><td>晚餐随餐</td><td>抑制5α-还原酶减少DHT→防经前痘</td></tr>
+<tr><td><b>甘氨酸镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>稳情绪+助眠+降皮质醇→保护孕酮</td></tr>
 </table>
 </div>
-<p class="why">防痘窗口开启！鱼油抗炎+镁降皮质醇+多维B5保孕酮+锌控皮脂。维C泡腾片可隔天加喝。葡萄籽继续空腹吃。</p>
+<div class="info-box"><b>锌吃的天：</b>D18(5/22)、D20(5/24)、D22(5/26) 吃 ｜ D17、D19、D21、D23 不吃</div>
+<p class="why">防痘窗口开启！鱼油抗炎+镁降皮质醇+多维B5保孕酮+锌控皮脂+葡萄籽抗氧化。维C泡腾片可隔天加喝。</p>
 </div>
 
 <div class="supp-card lut" style="border-color:#6c3483;background:#f5eaff">
-<h4>黄体晚期 D24-30（5/28-6/3）· 每天4种（锌隔天）</h4>
+<h4>黄体晚期 D24-30（5/28-6/3）</h4>
 <div class="table-wrap">
 <table>
 <tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
 <tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B5+B6支持孕酮+神经递质</td></tr>
 <tr><td><b>D3+K2</b> <span class="tag t-ir">新买</span> + <b>鱼油</b> <span class="tag t-om">已有</span></td><td>D3 2000IU+K2 + 鱼油1粒</td><td>午餐随餐</td><td>经前皮质醇飙升，Omega-3+D3双抗炎</td></tr>
-<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg <b>隔天吃</b></td><td>晚餐随餐</td><td>经前痘高发，锌持续抑制DHT+皮脂分泌</td></tr>
-<tr><td><b>镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>经前情绪波动最大，镁是GABA的关键辅助</td></tr>
+<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>两餐间空腹</td><td>抗氧化+抗炎，持续服用到月经期前停</td></tr>
+<tr><td><b>NOW甘氨酸锌 30mg</b> <span class="tag t-ir">新买</span></td><td>30mg</td><td>晚餐随餐</td><td>经前痘高发，锌持续抑制DHT+皮脂分泌</td></tr>
+<tr><td><b>甘氨酸镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>经前情绪波动最大，镁是GABA的关键辅助</td></tr>
 </table>
 </div>
-<p class="why" style="color:#c0392b">防痘决战期！配合控糖饮食+早睡+阿达帕林。维C泡腾片经前可每天喝。葡萄籽继续。</p>
+<div class="info-box"><b>锌吃的天：</b>D24(5/28)、D26(5/30)、D28(6/1)、D30(6/3) 吃 ｜ D25、D27、D29 不吃</div>
+<p class="why" style="color:#c0392b">防痘决战期！配合控糖饮食+早睡+阿达帕林。维C泡腾片经前可每天喝。</p>
 </div>
 
 <div class="card">
@@ -685,12 +689,43 @@ var CYCLE_LEN = 30;
 var WEEKDAYS = ['日','一','二','三','四','五','六'];
 
 var PHASE_DATA = {
-  men: {name:'月经期', color:'#c0392b', supp:'女性多维(早餐) + Thorne铁25mg+维C泡腾片(午餐后) + D3K2滴剂(午餐) + 镁(睡前)', focus:'补铁·温热饮食·轻柔运动·早睡·停用酸类护肤品', warn:'避免冷饮、咖啡、辛辣；铁和镁分开2小时'},
-  fol: {name:'卵泡期', color:'#27ae60', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + NOW锌30mg隔天(晚餐)', focus:'高蛋白增肌·力量训练·葡萄籽恢复·能量最强', warn:'趁能量好储备体能，不要放松饮食控制'},
-  ovu: {name:'排卵期', color:'#e67e22', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 葡萄籽(空腹) + NOW锌隔天', focus:'峰值爆发力·十字花科蔬菜·注意韧带', warn:'韧带较松，运动充分热身'},
-  lut: {name:'黄体早期', color:'#8e44ad', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 镁(睡前)', focus:'控糖防痘·补镁·维持运动·早睡', warn:'开始严格控糖！减少碳水，增加脂肪蛋白'},
-  lut2:{name:'黄体晚期', color:'#6c3483', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 镁(睡前)', focus:'防痘决战·绝对控糖·阿达帕林·11点前睡', warn:'禁奶茶甜品炸鸡！坚持阿达帕林每晚用'}
+  men: {name:'月经期', color:'#c0392b', focus:'补铁·温热饮食·轻柔运动·早睡·停用酸类护肤品', warn:'避免冷饮、咖啡、辛辣；铁和镁分开2小时'},
+  fol: {name:'卵泡期', color:'#27ae60', focus:'高蛋白增肌·力量训练·葡萄籽恢复·能量最强', warn:'趁能量好储备体能，不要放松饮食控制'},
+  ovu: {name:'排卵期', color:'#e67e22', focus:'峰值爆发力·十字花科蔬菜·注意韧带', warn:'韧带较松，运动充分热身'},
+  lut: {name:'黄体早期', color:'#8e44ad', focus:'控糖防痘·补镁·维持运动·早睡', warn:'开始严格控糖！减少碳水，增加脂肪蛋白'},
+  lut2:{name:'黄体晚期', color:'#6c3483', focus:'防痘决战·绝对控糖·阿达帕林·11点前睡', warn:'禁奶茶甜品炸鸡！坚持阿达帕林每晚用'}
 };
+
+// 锌隔天吃：D8起隔天，即D8,D10,D12,D14,D16,D18,D20,D22,D24,D26,D28,D30吃锌
+var ZINC_DAYS = {8:1,10:1,12:1,14:1,16:1,18:1,20:1,22:1,24:1,26:1,28:1,30:1};
+
+function getDaySupp(day) {
+  var phase = getPhase(day);
+  var items = [];
+  // 全周期：早餐随餐
+  items.push({name:'Swisse女性多维', time:'早餐随餐', tag:'已有'});
+  if (phase === 'men') {
+    // 月经期：铁+维C午餐后，D3K2午餐随餐，镁睡前，葡萄籽暂停
+    items.push({name:'Swanson铁18mg + 维C泡腾片', time:'午餐后30分钟', tag:'新买+已有'});
+    items.push({name:'D3+K2', time:'午餐随餐', tag:'新买'});
+    items.push({name:'甘氨酸镁 400mg', time:'睡前', tag:'已有'});
+  } else if (phase === 'fol') {
+    items.push({name:'D3+K2 + 鱼油', time:'午餐随餐', tag:'新买+已有'});
+    items.push({name:'葡萄籽', time:'两餐间空腹', tag:'已有'});
+    if (ZINC_DAYS[day]) items.push({name:'NOW锌 30mg', time:'晚餐随餐', tag:'新买'});
+  } else if (phase === 'ovu') {
+    items.push({name:'D3+K2 + 鱼油', time:'午餐随餐', tag:'新买+已有'});
+    items.push({name:'葡萄籽', time:'两餐间空腹', tag:'已有'});
+    if (ZINC_DAYS[day]) items.push({name:'NOW锌 30mg', time:'晚餐随餐', tag:'新买'});
+  } else {
+    // lut, lut2
+    items.push({name:'D3+K2 + 鱼油', time:'午餐随餐', tag:'新买+已有'});
+    items.push({name:'葡萄籽', time:'两餐间空腹', tag:'已有'});
+    if (ZINC_DAYS[day]) items.push({name:'NOW锌 30mg', time:'晚餐随餐', tag:'新买'});
+    items.push({name:'甘氨酸镁 400mg', time:'睡前', tag:'已有'});
+  }
+  return items;
+}
 
 // 每天的饮食数据 (Day 1-30)
 var MEALS = {
@@ -750,9 +785,15 @@ function renderTodayCard(day) {
   var phase = getPhase(day);
   var pd = PHASE_DATA[phase];
   var m = MEALS[day];
+  var supps = getDaySupp(day);
   var dateObj = new Date(CYCLE_START);
   dateObj.setDate(dateObj.getDate() + day - 1);
   var dateStr = (dateObj.getMonth()+1) + '月' + dateObj.getDate() + '日 周' + WEEKDAYS[dateObj.getDay()];
+
+  var suppHtml = supps.map(function(s){
+    var tagClass = s.tag.indexOf('新买')!==-1 ? 't-ir' : 't-om';
+    return '<div class="supp-row"><span class="supp-name">'+s.name+'</span><span class="supp-time">'+s.time+'</span><span class="tag '+tagClass+'">'+s.tag+'</span></div>';
+  }).join('');
 
   card.innerHTML = '<div class="tc-title">今日速查 — ' + dateStr +
     ' <span class="tc-badge" style="background:'+pd.color+'">Day '+day+' '+pd.name+'</span></div>' +
@@ -762,32 +803,15 @@ function renderTodayCard(day) {
     '<tr><td>午餐</td><td>'+m.l+'</td></tr>' +
     '<tr><td>晚餐</td><td>'+m.d+'</td></tr>' +
     '<tr><td>下午茶</td><td>'+m.t+'</td></tr></table></div>' +
-    '<div class="today-block"><h4>今日补剂</h4><div class="supp-pills">' + pd.supp.split('+').map(function(s){return '<span class="supp-pill">'+s.trim()+'</span>'}).join('') + '</div></div>' +
+    '<div class="today-block" style="grid-column:1/-1"><h4>今日补剂</h4><div class="supp-detail">' + suppHtml + '</div></div>' +
     '<div class="today-block"><h4>阶段重点</h4><ul class="focus-list">' + pd.focus.split('·').map(function(s){return '<li>'+s.trim()+'</li>'}).join('') + '</ul></div></div>' +
     '<div class="warn-box"><b>注意：</b>' + pd.warn + '</div>';
   card.style.display = 'block';
 }
 
 function showDay(day) {
-  var phase = getPhase(day);
-  var pd = PHASE_DATA[phase];
-  var m = MEALS[day] || {b:'-',l:'-',d:'-',t:'-'};
-  var dateObj = new Date(CYCLE_START);
-  dateObj.setDate(dateObj.getDate() + day - 1);
-  var dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate() + ' 周' + WEEKDAYS[dateObj.getDay()];
-
-  var popup = document.getElementById('day-popup');
-  document.getElementById('day-popup-content').innerHTML =
-    '<h3 style="color:'+pd.color+';margin-bottom:12px">'+dateStr+' · Day '+day+' '+pd.name+'</h3>' +
-    '<h4 style="font-size:13px;color:#888;margin:10px 0 6px">饮食计划</h4>' +
-    '<table style="font-size:13px"><tr><td style="font-weight:600;color:'+pd.color+';width:60px">早餐</td><td>'+m.b+'</td></tr>' +
-    '<tr><td style="font-weight:600;color:'+pd.color+'">午餐</td><td>'+m.l+'</td></tr>' +
-    '<tr><td style="font-weight:600;color:'+pd.color+'">晚餐</td><td>'+m.d+'</td></tr>' +
-    '<tr><td style="font-weight:600;color:'+pd.color+'">下午茶</td><td>'+m.t+'</td></tr></table>' +
-    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">补剂</h4><p style="font-size:13px">'+pd.supp+'</p>' +
-    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">重点</h4><p style="font-size:13px">'+pd.focus+'</p>' +
-    '<div class="warn-box" style="margin-top:12px"><b>注意：</b>'+pd.warn+'</div>';
-  popup.style.display = 'flex';
+  renderTodayCard(day);
+  document.getElementById('today-card-dynamic').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // 页面加载时：高亮今天 + 渲染今日速查 + 更新标题
