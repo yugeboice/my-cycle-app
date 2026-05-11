@@ -47,21 +47,87 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
   .hamburger{display:none}
   .overlay.open{display:block}
   .bottom-nav{display:flex}
-  /* 卡片padding缩小 */
   .card{padding:12px 10px;margin-bottom:12px}
   .container{padding:12px 8px}
-  /* 表格横向滚动 */
   .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table{font-size:12px}
-  /* SVG横滑 */
   .chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  /* hero字体 */
   .hero-bar h1{font-size:1.1rem}
   .hero-bar p{font-size:.78rem}
-  /* 今日速查卡片移动端 */
   .today-card .today-grid{grid-template-columns:1fr}
   .today-card .today-meals td{font-size:11px;padding:5px 4px}
 }
+
+/* ===== 移动端模式 ===== */
+.mobile-toggle{position:fixed;top:10px;right:10px;z-index:400;background:#2c1810;color:#fff;border:none;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.mobile-toggle:hover{background:#4a2020}
+
+body.mobile-mode .sidebar{display:none!important}
+body.mobile-mode .main{margin-left:0}
+body.mobile-mode .bottom-nav{display:flex}
+body.mobile-mode .hamburger{display:none}
+
+body.mobile-mode .hero-bar{padding:16px 12px}
+body.mobile-mode .hero-bar h1{font-size:1.2rem}
+body.mobile-mode .hero-bar p{font-size:0.75rem}
+body.mobile-mode .container{padding:10px 8px;max-width:100%}
+body.mobile-mode .card{padding:14px 12px;margin-bottom:10px;border-radius:14px}
+body.mobile-mode .card h2{font-size:15px;margin-bottom:8px}
+
+/* 日历移动端：更大触控区 */
+body.mobile-mode .cal{gap:4px}
+body.mobile-mode .cal-d{min-height:56px;padding:6px 2px;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:rgba(192,57,43,.15)}
+body.mobile-mode .cal-d:active{transform:scale(0.95)}
+body.mobile-mode .cal-d .dt{font-size:15px}
+body.mobile-mode .cal-d .inf{font-size:8px}
+body.mobile-mode .cal-h{font-size:12px}
+
+/* 今日卡片移动端 */
+body.mobile-mode .today-card{border-radius:14px;padding:14px}
+body.mobile-mode .today-card .tc-title{font-size:15px}
+body.mobile-mode .today-card .tc-badge{font-size:11px}
+body.mobile-mode .today-card .today-grid{grid-template-columns:1fr}
+body.mobile-mode .today-card .today-meals td{font-size:13px;padding:8px 6px}
+body.mobile-mode .today-card .today-meals td:first-child{font-size:13px;width:55px}
+body.mobile-mode .today-block h4{font-size:13px}
+
+/* 补剂行移动端 */
+body.mobile-mode .supp-row{padding:8px 10px;font-size:13px;gap:6px}
+body.mobile-mode .supp-name{font-size:13px;min-width:auto}
+body.mobile-mode .supp-time{font-size:11px}
+body.mobile-mode .supp-card h4{font-size:14px}
+body.mobile-mode .supp-card{padding:12px;font-size:13px}
+
+/* 表格移动端 */
+body.mobile-mode .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.mobile-mode table{font-size:12px}
+body.mobile-mode th{padding:6px;font-size:11px}
+body.mobile-mode td{padding:6px}
+
+/* 警告/信息框 */
+body.mobile-mode .warn-box{font-size:12px;padding:8px 10px}
+body.mobile-mode .info-box{font-size:12px;padding:8px 10px}
+body.mobile-mode .focus-list li{font-size:13px}
+body.mobile-mode .why{font-size:12px}
+body.mobile-mode .note{font-size:11px}
+
+/* 批次快跳移动端 */
+body.mobile-mode .batch-nav a{font-size:11px;padding:3px 8px}
+
+/* SVG图表移动端 */
+body.mobile-mode .chart-svg{min-width:600px;height:260px}
+body.mobile-mode .legend{font-size:11px}
+
+/* phase-legend */
+body.mobile-mode .phase-legend{font-size:10px;gap:4px}
+body.mobile-mode .phase-legend span{padding:2px 6px}
+
+/* 底部导航移动端加大 */
+body.mobile-mode .bottom-nav .bn-item{padding:8px 2px;font-size:10px}
+body.mobile-mode .bottom-nav .bn-item .bn-icon{font-size:20px}
+
+/* tag */
+body.mobile-mode .tag{font-size:9px;padding:1px 5px}
 
 /* ===== 内嵌内容样式（总览/饮食/补剂）===== */
 .container{max-width:900px;margin:0 auto;padding:20px 16px}
@@ -89,6 +155,8 @@ body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;backgr
 .cal-d.lut{background:#f3e0ff;border:1px solid #d1a3ff}
 .cal-d.lut2{background:#e8d5f5;border:1px solid #c090e0}
 .cal-d.today{outline:3px solid #ff4757;outline-offset:-1px}
+.cal-d.selected{outline:3px solid #333;outline-offset:-1px}
+.cal-d.today.selected{outline:3px solid #ff4757;outline-offset:-1px;box-shadow:0 0 0 2px #333}
 .cal-d.empty{background:transparent;border:none}
 .phase-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
 .phase-legend span{padding:2px 8px;border-radius:6px}
@@ -155,6 +223,7 @@ ul{padding-left:18px}li{margin:3px 0;font-size:13px}
 </head>
 <body>
 
+<button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileMode()">📱 移动端</button>
 <button class="hamburger" onclick="toggleSidebar()">☰</button>
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
@@ -810,6 +879,9 @@ function renderTodayCard(day) {
 }
 
 function showDay(day) {
+  document.querySelectorAll('.cal-d').forEach(function(el){ el.classList.remove('selected'); });
+  var sel = document.querySelector('.cal-d[data-day="'+day+'"]');
+  if (sel) sel.classList.add('selected');
   renderTodayCard(day);
   document.getElementById('today-card-dynamic').scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -842,6 +914,21 @@ function showDay(day) {
   dateObj.setDate(dateObj.getDate() + day - 1);
   var heroP = document.querySelector('.hero-bar p');
   if(heroP) heroP.textContent = '经期5月5日 · 周期30天 · 今天Day'+day+' '+pd.name+' · 无乳制品 · 肠胃敏感';
+})();
+
+function toggleMobileMode() {
+  document.body.classList.toggle('mobile-mode');
+  var btn = document.getElementById('mobileToggle');
+  var isMobile = document.body.classList.contains('mobile-mode');
+  btn.textContent = isMobile ? '🖥 桌面端' : '📱 移动端';
+  localStorage.setItem('mobileMode', isMobile ? '1' : '0');
+}
+(function(){
+  var saved = localStorage.getItem('mobileMode');
+  if (saved === '1' || (saved === null && window.innerWidth <= 768)) {
+    document.body.classList.add('mobile-mode');
+    document.getElementById('mobileToggle').textContent = '🖥 桌面端';
+  }
 })();
 
 </script>
