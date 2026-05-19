@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的周期管理 - 完整版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#fdf6f0;color:#2c2c2c;line-height:1.7;font-size:1rem;display:flex;min-height:100vh}
+
+/* 左侧导航 */
+.sidebar{width:220px;background:linear-gradient(180deg,#2c1810 0%,#4a2020 100%);color:#fff;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:200;transition:transform .3s}
+.sidebar .logo{padding:20px 16px 10px;font-size:16px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar .logo small{display:block;font-size:11px;opacity:.6;font-weight:400;margin-top:4px}
+.sidebar .badge{display:inline-block;background:#ff4757;padding:2px 8px;border-radius:10px;font-size:10px;margin-top:6px}
+.sidebar nav{padding:10px 0}
+.sidebar .nav-item{display:block;padding:10px 16px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;border-left:3px solid transparent;transition:.2s}
+.sidebar .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.sidebar .nav-item.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:#ff6b81;font-weight:600}
+.sidebar .nav-item .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.sidebar .nav-sep{border-top:1px solid rgba(255,255,255,.1);margin:8px 16px}
+.sidebar .nav-label{padding:6px 16px;font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.35);letter-spacing:1px}
+
+/* 主内容区 */
+.main{margin-left:220px;flex:1;min-height:100vh}
+.section{display:none;padding:0}
+.section.active{display:block}
+
+/* iframe嵌入 */
+.guide-frame{width:100%;border:none;min-height:100vh}
+
+/* Hamburger */
+.hamburger{display:none;position:fixed;top:10px;left:10px;z-index:300;background:#2c1810;color:#fff;border:none;padding:8px 12px;border-radius:8px;font-size:18px;cursor:pointer}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150}
+
+/* 底部导航（移动端） */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#2c1810;z-index:300;flex-direction:row;border-top:1px solid rgba(255,255,255,.15)}
+.bottom-nav .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 2px;color:rgba(255,255,255,.6);cursor:pointer;font-size:9px;gap:2px;border:none;background:none;transition:.2s}
+.bottom-nav .bn-item .bn-icon{font-size:18px;line-height:1}
+.bottom-nav .bn-item.active{color:#ff6b81}
+.bottom-nav .bn-item:hover{color:#fff}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding-bottom:68px}
+  .hamburger{display:none}
+  .overlay.open{display:block}
+  .bottom-nav{display:flex}
+  /* 卡片padding缩小 */
+  .card{padding:12px 10px;margin-bottom:12px}
+  .container{padding:12px 8px}
+  /* 表格横向滚动 */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:12px}
+  /* SVG横滑 */
+  .chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* hero字体 */
+  .hero-bar h1{font-size:1.1rem}
+  .hero-bar p{font-size:.78rem}
+  /* 今日速查卡片移动端 */
+  .today-card .today-grid{grid-template-columns:1fr}
+  .today-card .today-meals td{font-size:11px;padding:5px 4px}
+}
+
+/* ===== 内嵌内容样式（总览/饮食/补剂）===== */
+.container{max-width:900px;margin:0 auto;padding:20px 16px}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.card h2{font-size:17px;margin-bottom:10px;color:#333}
+.hero-bar{background:linear-gradient(135deg,#c0392b,#8e44ad);color:#fff;padding:24px 20px;text-align:center}
+.hero-bar h1{font-size:1.4rem;font-weight:700}
+.hero-bar p{opacity:.9;font-size:.85rem;margin-top:4px}
+
+/* 图表 */
+.chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.chart-svg{width:100%;min-width:680px;height:300px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px}
+.legend .d{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* 日历 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-h{font-size:11px;text-align:center;font-weight:600;color:#888;padding:4px}
+.cal-d{border-radius:8px;padding:5px 3px;text-align:center;font-size:11px;min-height:52px}
+.cal-d .dt{font-weight:700;font-size:13px}
+.cal-d .inf{font-size:9px;color:#555;margin-top:1px}
+.cal-d.men{background:#ffe0e0;border:1px solid #ffb3b3}
+.cal-d.fol{background:#e0f7e0;border:1px solid #a0d8a0}
+.cal-d.ovu{background:#fff3e0;border:1px solid #ffd699}
+.cal-d.lut{background:#f3e0ff;border:1px solid #d1a3ff}
+.cal-d.lut2{background:#e8d5f5;border:1px solid #c090e0}
+.cal-d.today{outline:3px solid #ff4757;outline-offset:-1px}
+.cal-d.empty{background:transparent;border:none}
+.phase-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px}
+.phase-legend span{padding:2px 8px;border-radius:6px}
+
+/* 表格 */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+th{background:#f5f0ea;padding:8px;text-align:left;font-size:12px;border:1px solid #e8e0d5}
+td{padding:8px;border:1px solid #e8e0d5;vertical-align:top}
+.day-c{width:55px;font-weight:600}
+
+/* 批次 */
+.batch-h{font-size:14px;font-weight:600;padding:8px 12px;border-radius:8px;margin-bottom:6px}
+.batch-h.men{background:#ffe0e0}.batch-h.fol{background:#e0f7e0}.batch-h.ovu{background:#fff3e0}.batch-h.lut{background:#f3e0ff}.batch-h.lut2{background:#e8d5f5}
+.shop{background:#f8f5f0;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px}
+.shop b{color:#c0392b}
+.note{font-size:11px;color:#888;font-style:italic;margin-top:4px}
+.tag{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;margin:1px}
+.t-ir{background:#ffe0e0;color:#c0392b}.t-pr{background:#e0f0ff;color:#2980b9}.t-mg{background:#f3e0ff;color:#8e44ad}.t-om{background:#e0f7e0;color:#27ae60}
+
+/* 补剂卡片 */
+.supp-card{border-left:4px solid;padding:14px;border-radius:0 10px 10px 0;margin:10px 0;font-size:13px}
+.supp-card.men{border-color:#c0392b;background:#fff5f5}
+.supp-card.fol{border-color:#27ae60;background:#f0fff4}
+.supp-card.ovu{border-color:#e67e22;background:#fff8f0}
+.supp-card.lut{border-color:#8e44ad;background:#faf0ff}
+.supp-card h4{font-size:14px;margin-bottom:6px}
+.supp-card .why{font-size:11px;color:#888}
+
+ul{padding-left:18px}li{margin:3px 0;font-size:13px}
+.footer{text-align:center;color:#999;font-size:11px;padding:20px}
+
+/* ===== 今日速查卡片 ===== */
+.today-card{background:linear-gradient(135deg,#fff5f5,#fff);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 16px rgba(192,57,43,.12);border:1.5px solid #ffb3b3}
+.today-card .tc-title{font-size:16px;font-weight:700;color:#c0392b;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.today-card .tc-title .tc-badge{background:#ff4757;color:#fff;font-size:11px;padding:2px 10px;border-radius:10px;font-weight:600}
+.today-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.today-block{background:#fff;border-radius:10px;padding:12px;border:1px solid #f0e0e0}
+.today-block h4{font-size:12px;color:#888;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.today-meals{width:100%;border-collapse:collapse;font-size:12.5px}
+.today-meals td{padding:6px 8px;border-bottom:1px solid #f5eded;vertical-align:top}
+.today-meals td:first-child{color:#c0392b;font-weight:600;white-space:nowrap;width:60px}
+.today-meals tr:last-child td{border-bottom:none}
+.supp-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.supp-pill{display:inline-flex;align-items:center;gap:4px;background:#fff5f5;border:1px solid #ffb3b3;border-radius:20px;padding:3px 10px;font-size:11.5px;color:#c0392b}
+.supp-pill .pill-time{color:#888;font-size:10px}
+.focus-list{list-style:none;padding:0;margin:0}
+.focus-list li{font-size:12.5px;padding:3px 0;border-bottom:1px solid #f5eded;display:flex;align-items:center;gap:6px}
+.focus-list li:last-child{border-bottom:none}
+.focus-list li::before{content:'·';color:#c0392b;font-weight:700;font-size:16px;line-height:1}
+.warn-box{background:#fff8e1;border-left:3px solid #f39c12;border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:#7d5a0a;margin-top:10px}
+.warn-box b{color:#e67e22}
+
+/* ===== 饮食计划mini导航 ===== */
+.batch-nav{background:#fff;border-radius:10px;padding:10px 14px;margin-bottom:12px;box-shadow:0 1px 8px rgba(0,0,0,.07);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
+.batch-nav a{display:inline-block;padding:4px 10px;margin:2px 3px;border-radius:14px;font-size:12px;text-decoration:none;color:#555;background:#f5f0ea;transition:.15s;border:1px solid transparent}
+.batch-nav a:hover{background:#ffe0e0;color:#c0392b}
+.batch-nav a.bn-men{border-color:#ffb3b3}.batch-nav a.bn-fol{border-color:#a0d8a0}.batch-nav a.bn-ovu{border-color:#ffd699}.batch-nav a.bn-lut{border-color:#d1a3ff}.batch-nav a.bn-lut2{border-color:#c090e0}
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- 左侧导航（桌面端） -->
+<div class="sidebar" id="sidebar">
+<div class="logo">
+  我的周期管理
+  <small>周期30天</small>
+  <div class="badge" id="today-badge">加载中...</div>
+  <div style="display:flex;gap:4px;margin-top:10px">
+    <a href="may.html" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);text-decoration:none;font-size:11px;text-align:center" id="link-may">5月</a>
+    <a href="june.html" style="flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:11px;text-align:center;font-weight:600" id="link-jun">6月</a>
+  </div>
+</div>
+<nav>
+  <div class="nav-label">总览</div>
+  <div class="nav-item active" onclick="go('overview',this)"><span class="dot" style="background:#ff4757"></span>激素曲线 &amp; 日历</div>
+
+  <div class="nav-sep"></div>
+  <div class="nav-label">周期指南</div>
+  <div class="nav-item" onclick="go('period',this)"><span class="dot" style="background:#c0392b"></span>月经期 D1-7</div>
+  <div class="nav-item" onclick="go('follicular',this)"><span class="dot" style="background:#27ae60"></span>卵泡期 D8-13</div>
+  <div class="nav-item" onclick="go('ovulation',this)"><span class="dot" style="background:#e67e22"></span>排卵期 D14-16</div>
+  <div class="nav-item" onclick="go('luteal',this)"><span class="dot" style="background:#8e44ad"></span>黄体期 D17-30</div>
+  <div class="nav-item" onclick="go('conflict',this)"><span class="dot" style="background:#2c3e50"></span>观点冲突对比</div>
+
+  <div class="nav-sep"></div>
+  <div class="nav-label">个人计划</div>
+  <div class="nav-item" onclick="go('meal',this)"><span class="dot" style="background:#d35400"></span>饮食计划</div>
+  <div class="nav-item" onclick="go('nutrition',this)"><span class="dot" style="background:#e67e22"></span>食物营养</div>
+  <div class="nav-item" onclick="go('supp',this)"><span class="dot" style="background:#16a085"></span>营养补给</div>
+</nav>
+</div>
+
+<!-- 底部导航（移动端） -->
+<div class="bottom-nav" id="bottom-nav">
+  <button class="bn-item active" data-sec="overview" onclick="go('overview',this)"><span class="bn-icon">📊</span>总览</button>
+  <button class="bn-item" data-sec="period" onclick="go('period',this)"><span class="bn-icon">🔴</span>经期</button>
+  <button class="bn-item" data-sec="follicular" onclick="go('follicular',this)"><span class="bn-icon">🟢</span>卵泡</button>
+  <button class="bn-item" data-sec="luteal" onclick="go('luteal',this)"><span class="bn-icon">🟣</span>黄体</button>
+  <button class="bn-item" data-sec="meal" onclick="go('meal',this)"><span class="bn-icon">🥗</span>饮食</button>
+  <button class="bn-item" data-sec="nutrition" onclick="go('nutrition',this)"><span class="bn-icon">📋</span>营养</button>
+  <button class="bn-item" data-sec="supp" onclick="go('supp',this)"><span class="bn-icon">💊</span>补剂</button>
+</div>
+
+<!-- 主内容区 -->
+<div class="main">
+
+<!-- ===== 总览 ===== -->
+<div class="section active" id="sec-overview">
+<div class="hero-bar">
+<h1>我的周期管理仪表盘</h1>
+<p>经期6月4日 · 周期30天 · 今天Day3 月经期 · 无乳制品 · 肠胃敏感</p>
+</div>
+<div class="container">
+<div class="card">
+<h2>激素变化曲线</h2>
+<div class="chart-wrap">
+<svg class="chart-svg" viewBox="0 0 740 290" xmlns="http://www.w3.org/2000/svg">
+<rect x="50" y="20" width="156" height="220" fill="#ffe0e0" opacity=".25" rx="4"/>
+<rect x="206" y="20" width="134" height="220" fill="#e0f7e0" opacity=".25" rx="4"/>
+<rect x="340" y="20" width="67" height="220" fill="#fff3e0" opacity=".25" rx="4"/>
+<rect x="407" y="20" width="156" height="220" fill="#f3e0ff" opacity=".2" rx="4"/>
+<rect x="563" y="20" width="156" height="220" fill="#e8d5f5" opacity=".2" rx="4"/>
+<text x="128" y="14" text-anchor="middle" font-size="10" fill="#c0392b" font-weight="600">月经期 D1-7</text>
+<text x="273" y="14" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="600">卵泡期 D8-13</text>
+<text x="373" y="14" text-anchor="middle" font-size="10" fill="#e67e22" font-weight="600">排卵D14-16</text>
+<text x="485" y="14" text-anchor="middle" font-size="10" fill="#8e44ad" font-weight="600">黄体早D17-23</text>
+<text x="641" y="14" text-anchor="middle" font-size="10" fill="#6c3483" font-weight="600">黄体晚D24-30</text>
+<line x1="50" y1="240" x2="719" y2="240" stroke="#ccc"/><line x1="50" y1="20" x2="50" y2="240" stroke="#ccc"/>
+<text x="50" y="256" font-size="8" fill="#999">6/4</text><text x="93" y="256" font-size="8" fill="#ff4757" font-weight="700">6/6</text><text x="156" y="256" font-size="8" fill="#999">6/10</text><text x="206" y="256" font-size="8" fill="#999">6/11</text><text x="340" y="256" font-size="8" fill="#999">6/17</text><text x="407" y="256" font-size="8" fill="#999">6/20</text><text x="563" y="256" font-size="8" fill="#999">6/27</text><text x="700" y="256" font-size="8" fill="#999">7/3</text>
+<polyline points="50,210 72,208 93,205 115,200 137,195 156,190 178,165 200,135 222,95 244,65 266,45 288,38 310,34 332,30 351,28 373,32 385,60 396,80 407,95 429,85 451,78 473,73 495,80 517,90 540,100 563,115 580,135 600,155 622,175 641,190 663,205 685,215 706,220" fill="none" stroke="#e74c3c" stroke-width="2.5" stroke-linejoin="round"/>
+<polyline points="50,232 72,232 93,232 115,232 137,232 156,232 178,232 200,230 222,230 244,230 266,230 288,230 310,230 332,228 351,222 373,195 385,145 396,105 407,78 429,58 451,48 473,44 495,50 517,58 540,68 563,85 580,115 600,145 622,175 641,200 663,220 685,230 706,232" fill="none" stroke="#3498db" stroke-width="2.5" stroke-linejoin="round"/>
+<polyline points="50,195 72,195 93,193 115,192 137,191 156,189 178,186 200,184 222,182 244,179 266,177 288,174 310,172 332,170 351,162 373,152 385,165 396,172 407,180 429,183 451,185 473,187 495,188 517,190 540,191 563,192 580,193 600,194 622,194 641,195 663,195 685,195 706,195" fill="none" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3" stroke-linejoin="round"/>
+<line x1="93" y1="20" x2="93" y2="240" stroke="#ff4757" stroke-width="2" stroke-dasharray="4,3"/>
+<rect x="76" y="22" width="34" height="14" rx="4" fill="#ff4757"/><text x="93" y="32" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">今天</text>
+<text x="128" y="275" text-anchor="middle" font-size="8" fill="#999">疲劳·补铁·修复</text>
+<text x="273" y="275" text-anchor="middle" font-size="8" fill="#999">能量↑·增肌·力量</text>
+<text x="373" y="275" text-anchor="middle" font-size="8" fill="#999">峰值·爆发</text>
+<text x="485" y="275" text-anchor="middle" font-size="8" fill="#999">稳定·补镁</text>
+<text x="641" y="275" text-anchor="middle" font-size="8" fill="#999">控糖·防痘</text>
+<text x="45" y="32" text-anchor="end" font-size="8" fill="#999">高</text><text x="45" y="237" text-anchor="end" font-size="8" fill="#999">低</text>
+</svg>
+</div>
+<div class="legend"><span><span class="d" style="background:#e74c3c"></span>雌激素</span><span><span class="d" style="background:#3498db"></span>孕酮</span><span><span class="d" style="background:#27ae60"></span>睾酮</span></div>
+</div>
+
+<div class="card">
+<h2>30天周期日历（6/4-7/3）</h2>
+<div class="phase-legend"><span style="background:#ffe0e0">月经期</span><span style="background:#e0f7e0">卵泡期</span><span style="background:#fff3e0">排卵期</span><span style="background:#f3e0ff">黄体早</span><span style="background:#e8d5f5">黄体晚</span></div>
+<div class="cal" id="cycle-calendar">
+<div class="cal-h">一</div><div class="cal-h">二</div><div class="cal-h">三</div><div class="cal-h">四</div><div class="cal-h">五</div><div class="cal-h">六</div><div class="cal-h">日</div>
+<!-- 6/4是周四，前面补3个空格 -->
+<div class="cal-d empty"></div><div class="cal-d empty"></div><div class="cal-d empty"></div>
+<div class="cal-d men" data-day="1" onclick="showDay(1)"><div class="dt">4</div><div class="inf">D1经期</div></div><div class="cal-d men" data-day="2" onclick="showDay(2)"><div class="dt">5</div><div class="inf">D2</div></div><div class="cal-d men" data-day="3" onclick="showDay(3)"><div class="dt">6</div><div class="inf">D3</div></div><div class="cal-d men" data-day="4" onclick="showDay(4)"><div class="dt">7</div><div class="inf">D4</div></div>
+<div class="cal-d men" data-day="5" onclick="showDay(5)"><div class="dt">8</div><div class="inf">D5</div></div><div class="cal-d men" data-day="6" onclick="showDay(6)"><div class="dt">9</div><div class="inf">D6</div></div><div class="cal-d men" data-day="7" onclick="showDay(7)"><div class="dt">10</div><div class="inf">D7末</div></div><div class="cal-d fol" data-day="8" onclick="showDay(8)"><div class="dt">11</div><div class="inf">D8卵泡</div></div><div class="cal-d fol" data-day="9" onclick="showDay(9)"><div class="dt">12</div><div class="inf">D9</div></div><div class="cal-d fol" data-day="10" onclick="showDay(10)"><div class="dt">13</div><div class="inf">D10</div></div><div class="cal-d fol" data-day="11" onclick="showDay(11)"><div class="dt">14</div><div class="inf">D11</div></div>
+<div class="cal-d fol" data-day="12" onclick="showDay(12)"><div class="dt">15</div><div class="inf">D12</div></div><div class="cal-d fol" data-day="13" onclick="showDay(13)"><div class="dt">16</div><div class="inf">D13</div></div><div class="cal-d ovu" data-day="14" onclick="showDay(14)"><div class="dt">17</div><div class="inf">D14排卵</div></div><div class="cal-d ovu" data-day="15" onclick="showDay(15)"><div class="dt">18</div><div class="inf">D15</div></div><div class="cal-d ovu" data-day="16" onclick="showDay(16)"><div class="dt">19</div><div class="inf">D16</div></div><div class="cal-d lut" data-day="17" onclick="showDay(17)"><div class="dt">20</div><div class="inf">D17黄体</div></div><div class="cal-d lut" data-day="18" onclick="showDay(18)"><div class="dt">21</div><div class="inf">D18</div></div>
+<div class="cal-d lut" data-day="19" onclick="showDay(19)"><div class="dt">22</div><div class="inf">D19</div></div><div class="cal-d lut" data-day="20" onclick="showDay(20)"><div class="dt">23</div><div class="inf">D20</div></div><div class="cal-d lut" data-day="21" onclick="showDay(21)"><div class="dt">24</div><div class="inf">D21</div></div><div class="cal-d lut" data-day="22" onclick="showDay(22)"><div class="dt">25</div><div class="inf">D22</div></div><div class="cal-d lut" data-day="23" onclick="showDay(23)"><div class="dt">26</div><div class="inf">D23</div></div><div class="cal-d lut2" data-day="24" onclick="showDay(24)"><div class="dt">27</div><div class="inf">D24晚黄体</div></div><div class="cal-d lut2" data-day="25" onclick="showDay(25)"><div class="dt">28</div><div class="inf">D25</div></div>
+<div class="cal-d lut2" data-day="26" onclick="showDay(26)"><div class="dt">29</div><div class="inf">D26</div></div><div class="cal-d lut2" data-day="27" onclick="showDay(27)"><div class="dt">30</div><div class="inf">D27</div></div><div class="cal-d lut2" data-day="28" onclick="showDay(28)"><div class="dt">7/1</div><div class="inf">D28</div></div><div class="cal-d lut2" data-day="29" onclick="showDay(29)"><div class="dt">7/2</div><div class="inf">D29</div></div><div class="cal-d lut2" data-day="30" onclick="showDay(30)"><div class="dt">7/3</div><div class="inf">D30</div></div>
+<div class="cal-d men"><div class="dt">7/4</div><div class="inf">下次经期</div></div><div class="cal-d empty"></div>
+<p class="note" style="margin-top:8px">点击日期查看当天计划</p>
+</div>
+
+<!-- 日详情弹窗 -->
+<div id="day-popup" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="background:#fff;border-radius:14px;max-width:400px;width:90%;max-height:80vh;overflow-y:auto;padding:20px;margin:auto;position:relative">
+<button onclick="document.getElementById('day-popup').style.display='none'" style="position:absolute;top:10px;right:14px;border:none;background:none;font-size:20px;cursor:pointer;color:#999">&times;</button>
+<div id="day-popup-content"></div>
+</div>
+</div>
+
+<!-- ===== 今日速查（动态） ===== -->
+<div class="today-card" id="today-card-dynamic"></div>
+<!-- 旧的硬编码今日速查已移除，由JS动态生成 -->
+
+</div>
+</div>
+
+<!-- ===== 周期指南（iframe嵌入原始完整版）===== -->
+<div class="section" id="sec-period"><iframe class="guide-frame" src="cycle_guide.html#period" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe></div>
+<div class="section" id="sec-follicular"><iframe class="guide-frame" src="cycle_guide.html#follicular" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe></div>
+<div class="section" id="sec-ovulation"><iframe class="guide-frame" src="cycle_guide.html#ovulation" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe></div>
+<div class="section" id="sec-luteal"><iframe class="guide-frame" src="cycle_guide.html#luteal" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe></div>
+<div class="section" id="sec-conflict"><iframe class="guide-frame" src="cycle_guide.html#conflict" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe></div>
+
+<!-- ===== 饮食计划 ===== -->
+<div class="section" id="sec-meal">
+<div class="hero-bar"><h1>28天饮食计划</h1><p>52kg · 无乳制品 · 食材2-3天复用 · 肠胃友好 · 含下午茶</p></div>
+<div class="container">
+
+<!-- 批次快速跳转 -->
+<div class="card" style="padding:14px">
+<h2 style="margin-bottom:10px;font-size:15px">快速跳转</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+<a href="#batch1" style="display:block;padding:8px;border-radius:8px;background:#ffe0e0;text-decoration:none;color:#c0392b;font-size:12px;font-weight:600;text-align:center">6/4-6<br><span style="font-weight:400;font-size:10px">月经期</span></a>
+<a href="#batch2" style="display:block;padding:8px;border-radius:8px;background:#ffe0e0;text-decoration:none;color:#c0392b;font-size:12px;font-weight:600;text-align:center">6/7-9<br><span style="font-weight:400;font-size:10px">月经→卵泡</span></a>
+<a href="#batch3" style="display:block;padding:8px;border-radius:8px;background:#e0f7e0;text-decoration:none;color:#27ae60;font-size:12px;font-weight:600;text-align:center">6/10-12<br><span style="font-weight:400;font-size:10px">卵泡期</span></a>
+<a href="#batch4" style="display:block;padding:8px;border-radius:8px;background:#e0f7e0;text-decoration:none;color:#27ae60;font-size:12px;font-weight:600;text-align:center">6/13-15<br><span style="font-weight:400;font-size:10px">卵泡→排卵</span></a>
+<a href="#batch5" style="display:block;padding:8px;border-radius:8px;background:#fff3e0;text-decoration:none;color:#e67e22;font-size:12px;font-weight:600;text-align:center">6/16-18<br><span style="font-weight:400;font-size:10px">排卵→黄体</span></a>
+<a href="#batch6" style="display:block;padding:8px;border-radius:8px;background:#f3e0ff;text-decoration:none;color:#8e44ad;font-size:12px;font-weight:600;text-align:center">6/19-21<br><span style="font-weight:400;font-size:10px">黄体早期</span></a>
+<a href="#batch7" style="display:block;padding:8px;border-radius:8px;background:#f3e0ff;text-decoration:none;color:#8e44ad;font-size:12px;font-weight:600;text-align:center">6/22-24<br><span style="font-weight:400;font-size:10px">黄体中期</span></a>
+<a href="#batch8" style="display:block;padding:8px;border-radius:8px;background:#e8d5f5;text-decoration:none;color:#6c3483;font-size:12px;font-weight:600;text-align:center">6/25-27<br><span style="font-weight:400;font-size:10px;color:#c0392b">防痘关键期</span></a>
+<a href="#batch9" style="display:block;padding:8px;border-radius:8px;background:#e8d5f5;text-decoration:none;color:#6c3483;font-size:12px;font-weight:600;text-align:center">6/28-7/3<br><span style="font-weight:400;font-size:10px">黄体末→经期</span></a>
+</div></div>
+
+<div class="card">
+<h2>每日营养目标（52kg女性）</h2>
+<div class="table-wrap">
+<table>
+<tr><th>营养素</th><th>月经期</th><th>卵泡期</th><th>排卵期</th><th>黄体期</th><th>来源</th></tr>
+<tr><td><b>热量</b></td><td>1500-1600kcal</td><td>1600-1800kcal</td><td>1700-1800kcal</td><td>1700-1900kcal(代谢↑5-10%)</td><td>博主+医学</td></tr>
+<tr><td><b>蛋白质</b></td><td>52g(1g/kg)</td><td>62-78g(1.2-1.5g/kg)</td><td>62-78g</td><td>62g(1.2g/kg)</td><td>博主1g/kg+运动期增加</td></tr>
+<tr><td><b>脂肪</b></td><td>≥44g(≥25%能量)</td><td>50-60g(30%)</td><td>50-55g</td><td>55-65g(增加脂肪)</td><td>博主≥25%</td></tr>
+<tr><td><b>碳水</b></td><td>160-180g</td><td>170-200g</td><td>160-180g</td><td><b>120-150g(严格控糖)</b></td><td>黄体期减碳水防痘</td></tr>
+<tr><td><b>膳食纤维</b></td><td>20-25g</td><td>25-30g</td><td>28-30g</td><td>25g</td><td>RDA 25g</td></tr>
+<tr><td><b>铁</b></td><td><b>18mg+</b></td><td>8mg</td><td>8mg</td><td>8mg</td><td>NIH</td></tr>
+<tr><td><b>锌</b></td><td>8mg</td><td><b>12-15mg</b></td><td><b>12-15mg</b></td><td>8mg</td><td>修复肠道+控皮脂</td></tr>
+<tr><td><b>钙(食物)</b></td><td>800mg</td><td>800mg</td><td>800mg</td><td>800mg</td><td>不补剂，食物来源</td></tr>
+<tr><td><b>Omega-3</b></td><td>1g EPA+DHA</td><td>1-2g</td><td>1g</td><td>1-2g(抗炎)</td><td>博主+医学</td></tr>
+<tr><td><b>镁</b></td><td>310mg</td><td>310mg</td><td>310mg</td><td><b>400mg</b></td><td>黄体期加量</td></tr>
+</table>
+</div>
+<p class="note">常见食物蛋白质参考：鸡蛋1个≈6g | 鸡胸100g≈31g | 三文鱼100g≈20g | 牛肉100g≈26g | 豆腐100g≈8g | 鹰嘴豆100g≈19g | 虾100g≈24g</p>
+</div>
+
+
+<div id="batch1" class="card"><div class="batch-h men">采购①｜6/4-6 月经期D3-5 <span class="tag t-ir">补铁</span></div>
+<div class="shop"><b>采购：</b>猪肝200g · 牛腱肉300g · 三文鱼200g · 鸡蛋6个 · 菠菜1把 · 南瓜半个 · 荞麦面 · 生姜 · 大枣 · <b style="color:#27ae60">猕猴桃3个 · 核桃1小袋 · 黑芝麻</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐(P12g F15g C30g)</th><th>午餐(P20g F12g C40g)</th><th>晚餐(P18g F15g C35g)</th><th>下午茶(P3g F8g)</th></tr>
+<tr><td class="day-c">6/4四<br>D3</td><td>红枣姜茶+水煮蛋2个(12gP)+亚麻籽粉1勺+黑芝麻</td><td>猪肝80g(20gP)+菠菜汤+南瓜块</td><td>清炖牛腱肉80g(21gP)+荞麦面60g+焯菠菜</td><td>猕猴桃1个+核桃5颗</td></tr>
+<tr><td class="day-c">6/5五<br>D4</td><td>南瓜块+煎蛋2个(12gP)+姜茶+黑芝麻</td><td>牛腱肉切片80g(21gP)+菠菜+南瓜</td><td>香煎三文鱼100g(20gP)+荞麦面+蛋花汤</td><td>猕猴桃1个+核桃5颗</td></tr>
+<tr><td class="day-c">6/6六<br>D5</td><td>红枣姜茶+煎蛋2个+亚麻籽粉</td><td>猪肝+三文鱼拌荞麦面</td><td>牛腱肉汤+菠菜+南瓜</td><td>猕猴桃1个+核桃</td></tr></table>
+</div>
+<p class="note">每日目标：P52g F44g+ C170g | 温热为主，猪肝+菠菜双重补铁。猕猴桃维C促铁吸收。避免冷饮咖啡。</p></div>
+
+<div id="batch2" class="card"><div class="batch-h men">采购②｜6/7-9 月经末→卵泡D6-8 <span class="tag t-ir">补铁</span><span class="tag t-pr">增蛋白</span></div>
+<div class="shop"><b>采购：</b>鸡胸300g · 大虾200g · 鸡蛋6个 · 豆腐1盒 · 南瓜半个 · 小白菜 · 番茄3个 · 糙米 · <b style="color:#27ae60">黑豆200g · 苹果3个 · 杏仁1小袋</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐(P14g F12g C35g)</th><th>午餐(P22g F12g C45g)</th><th>晚餐(P20g F14g C35g)</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/7日<br>D6</td><td>椰奶亚麻籽粉+煎蛋2个+黑芝麻</td><td>番茄蛋汤+糙米80g+南瓜蒸块</td><td>白灼大虾100g(24gP)+小白菜+糙米</td><td>苹果1个+杏仁10颗</td></tr>
+<tr><td class="day-c">6/8一<br>D7末</td><td>南瓜粥(椰奶版)+煎蛋2个</td><td>鸡胸100g(31gP)+小白菜+糙米</td><td>番茄豆腐汤(8gP)+虾仁炒蛋</td><td>苹果1个+杏仁</td></tr>
+<tr><td class="day-c">6/9二<br>D8卵泡</td><td>椰奶黑豆浆+煮蛋2个</td><td>鸡胸+番茄+糙米(带饭)</td><td>豆腐虾仁煲+南瓜</td><td>苹果半个+杏仁</td></tr></table>
+</div>
+<p class="note">每日目标：P55g→62g F45g C180g | 过渡期，蛋白质逐渐增加。黑豆补铁+蛋白。</p></div>
+
+<div id="batch3" class="card"><div class="batch-h fol">采购③｜6/10-12 卵泡期D9-11 <span class="tag t-pr">高蛋白增肌</span></div>
+<div class="shop"><b>采购：</b>牛排300g · 三文鱼300g · 鸡蛋6个 · 牛油果2个 · 西兰花1颗 · 芦笋 · 藜麦 · <b style="color:#27ae60">南瓜籽+亚麻籽 · 蓝莓1盒 · 鹰嘴豆罐头1罐 · 柠檬</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐(P16g F20g C25g)</th><th>午餐(P25g F15g C40g)</th><th>晚餐(P28g F18g C20g)</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/10三<br>D9</td><td>牛油果半个(10gF)+煎蛋2个(12gP)+亚麻籽粉</td><td>煎三文鱼100g(20gP)+藜麦60g+西兰花</td><td>煎牛排120g(31gP)+芦笋+橄榄油</td><td>蓝莓一把+南瓜籽20g(7gP)</td></tr>
+<tr><td class="day-c">6/11四<br>D10</td><td>牛油果蛋杯+南瓜籽+黑芝麻</td><td>三文鱼藜麦碗+柠檬汁+西兰花</td><td>牛排切片+鹰嘴豆沙拉(19gP/100g)+橄榄油</td><td>蓝莓+南瓜籽</td></tr>
+<tr><td class="day-c">6/12五<br>D11</td><td>煎蛋2个+南瓜籽+椰奶</td><td>芦笋鸡胸(外食)</td><td>三文鱼+鹰嘴豆+藜麦</td><td>蓝莓+南瓜籽</td></tr></table>
+</div>
+<p class="note">每日目标：<b>P70g+ F55g C180g</b> | 增肌黄金期！鹰嘴豆=植物蛋白19g/100g+纤维。力量训练75-85%1RM。</p></div>
+
+<div id="batch4" class="card"><div class="batch-h fol">采购④｜6/13-15 卵泡末→排卵D12-14 <span class="tag t-pr">蛋白</span><span class="tag t-om">十字花科</span></div>
+<div class="shop"><b>采购：</b>鸡腿400g · 大虾300g · <b style="color:#27ae60">鳕鱼250g</b> · 鸡蛋6个 · 秋葵 · 紫甘蓝 · 胡萝卜 · 蘑菇 · 糙米 · <b style="color:#27ae60">奇亚籽 · 橙子3个 · 腰果</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/13六<br>D12</td><td>奇亚籽椰奶布丁(前晚泡)+煎蛋2个</td><td>鸡腿100g(26gP)+紫甘蓝丝+糙米</td><td>清蒸鳕鱼120g(22gP)+秋葵+蘑菇汤</td><td>橙子1个+腰果10颗</td></tr>
+<tr><td class="day-c">6/14日<br>D13</td><td>鸡蛋2个+胡萝卜+亚麻籽粉+黑芝麻</td><td>椰奶鸡腿咖喱+糙米</td><td>蒜蓉大虾100g(24gP)+紫甘蓝+蘑菇</td><td>橙子1个+腰果</td></tr>
+<tr><td class="day-c">6/15一<br>D14排卵</td><td>奇亚籽碗+煎蛋+南瓜籽</td><td>蘑菇鸡肉饭+秋葵</td><td>大虾+鳕鱼汤+蔬菜</td><td>橙子+腰果</td></tr></table>
+</div>
+<p class="note">每日目标：<b>P70g F55g C170g</b> | 鳕鱼加入！高蛋白低脂(17gP/100g)肠胃温和。十字花科蔬菜助雌激素代谢。</p></div>
+
+<div id="batch5" class="card"><div class="batch-h ovu">采购⑤｜6/16-18 排卵末→黄体D15-17 <span class="tag t-mg">补镁</span><span class="tag t-om">Omega-3</span></div>
+<div class="shop"><b>采购：</b>三文鱼300g · 羊肉200g · 鸡蛋6个 · 菠菜 · 山药 · 黑木耳 · 腰果 · 荞麦面 · 黑巧85% · <b style="color:#27ae60">香蕉3根 · 黑豆(泡好) · 黑芝麻</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/16二<br>D15</td><td>煎蛋2个+山药泥+亚麻籽粉+黑芝麻</td><td>三文鱼100g(20gP)+菠菜+荞麦面</td><td>羊肉片汤80g(21gP)+黑木耳+山药</td><td>香蕉半根+腰果10颗+黑巧1块</td></tr>
+<tr><td class="day-c">6/17三<br>D16</td><td>椰奶姜黄拿铁+煎蛋2个+腰果</td><td>羊肉菠菜汤+荞麦面+黑豆</td><td>三文鱼+山药+黑木耳</td><td>香蕉半根+腰果+黑巧</td></tr>
+<tr><td class="day-c">6/18四<br>D17黄体</td><td>鸡蛋2个+腰果+黑巧1块+黑芝麻</td><td>三文鱼饭团(带饭)+黑豆</td><td>羊肉汤面+菠菜</td><td>香蕉半根+腰果</td></tr></table>
+</div>
+<p class="note">每日目标：P62g <b>F60g</b> <b>C150g(开始减碳)</b> | 香蕉补镁+钾。黑豆补铁+蛋白。黑巧补镁解甜瘾。</p></div>
+
+<div id="batch6" class="card"><div class="batch-h lut">采购⑥｜6/19-21 黄体早D18-20 <span class="tag t-mg">稳血糖防痘</span></div>
+<div class="shop"><b>采购：</b>鸡胸300g · <b style="color:#27ae60">鳕鱼300g</b> · 鸡蛋6个 · 南瓜半个 · 深绿叶菜(羽衣甘蓝) · 牛油果2个 · 核桃 · 糙米 · <b style="color:#27ae60">蓝莓1盒 · 鹰嘴豆罐头</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/19五<br>D18</td><td>牛油果煎蛋2个+亚麻籽粉</td><td>鸡胸100g(31gP)+南瓜+少量糙米</td><td>清蒸鳕鱼120g(22gP)+深绿叶菜+橄榄油</td><td>蓝莓一把+核桃5颗</td></tr>
+<tr><td class="day-c">6/20六<br>D19</td><td>南瓜椰奶粥+煎蛋2个+核桃</td><td>鸡胸鹰嘴豆沙拉+牛油果</td><td>鳕鱼+深绿叶菜+少量糙米</td><td>蓝莓+核桃</td></tr>
+<tr><td class="day-c">6/21日<br>D20</td><td>椰奶亚麻籽碗+煎蛋+黑芝麻</td><td>南瓜鸡肉+鹰嘴豆饭</td><td>鳕鱼汤+绿叶菜</td><td>蓝莓+核桃</td></tr></table>
+</div>
+<p class="note">每日目标：P62g F55g <b>C130g(严格控糖!)</b> | 鳕鱼×鹰嘴豆=高蛋白+高纤维。控碳水防经前痘。</p></div>
+
+<div id="batch7" class="card"><div class="batch-h lut">采购⑦｜6/22-24 黄体中D21-23 <span class="tag t-mg">保孕酮</span></div>
+<div class="shop"><b>采购：</b>牛腱肉300g · 大虾250g · 鸡蛋6个 · 西兰花 · 南瓜半个 · 洋葱 · 蘑菇 · 荞麦面 · <b style="color:#27ae60">苹果2个 · 南瓜籽 · 黑芝麻</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/22一<br>D21</td><td>南瓜块+煎蛋2个+亚麻籽粉+黑芝麻</td><td>牛腱肉80g(21gP)+西兰花+荞麦面60g</td><td>大虾蘑菇汤+南瓜块</td><td>苹果半个+南瓜籽20g</td></tr>
+<tr><td class="day-c">6/23二<br>D22</td><td>蘑菇炒蛋2个+南瓜块</td><td>牛肉丝+洋葱+西兰花+荞麦面</td><td>大虾100g(24gP)+蘑菇蔬菜汤</td><td>苹果半个+南瓜籽</td></tr>
+<tr><td class="day-c">6/24三<br>D23</td><td>煎蛋2个+椰奶+黑芝麻</td><td>牛肉+南瓜+西兰花(带饭)</td><td>洋葱虾仁+荞麦面</td><td>苹果+南瓜籽</td></tr></table>
+</div>
+<p class="note">每日目标：P62g F55g <b>C130g</b> | 情绪可能波动。瑜伽/普拉提为佳。早睡。苹果低GI=安全水果。</p></div>
+
+<div id="batch8" class="card"><div class="batch-h lut2">采购⑧｜6/25-27 黄体晚D24-26 <span class="tag t-mg">防痘关键！</span></div>
+<div class="shop"><b>采购：</b>三文鱼300g · 鸡腿300g · 鸡蛋6个 · 菠菜 · 牛油果2个 · 山药 · 腰果 · 黑巧85% · 荞麦面 · <b style="color:#27ae60">鹰嘴豆 · 蓝莓 · 黑芝麻</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/25四<br>D24</td><td>牛油果煎蛋2个+亚麻籽粉+黑芝麻</td><td>三文鱼100g(20gP)+菠菜+荞麦面60g</td><td>鸡腿100g(26gP)+山药汤</td><td>蓝莓+腰果10颗+黑巧1块</td></tr>
+<tr><td class="day-c">6/26五<br>D25</td><td>椰奶姜黄拿铁+煎蛋2个+腰果</td><td>鸡腿+牛油果+鹰嘴豆菠菜沙拉</td><td>三文鱼+山药+荞麦面</td><td>蓝莓+腰果+黑巧</td></tr>
+<tr><td class="day-c">6/27六<br>D26</td><td>煎蛋2个+黑巧2块+腰果+黑芝麻</td><td>外食选蛋白+蔬菜(不加糖)</td><td>三文鱼菠菜汤+山药</td><td>蓝莓+腰果</td></tr></table>
+</div>
+<p class="note" style="color:#c0392b;font-weight:600">每日目标：P62g F60g <b>C120g(最严格!)</b> | 防痘决战期！禁奶茶甜品炸鸡。阿达帕林每晚。11点前睡。</p></div>
+
+<div id="batch9" class="card"><div class="batch-h lut2">采购⑨｜6/28-7/3 黄体末D27-30 <span class="tag t-ir">准备补铁</span></div>
+<div class="shop"><b>采购：</b>猪肝200g · 牛肉300g · <b style="color:#27ae60">鳕鱼200g</b> · 鸡蛋6个 · 南瓜半个 · 小白菜 · 番茄3个 · 大枣 · 生姜 · 糙米 · <b style="color:#27ae60">猕猴桃3个 · 核桃 · 黑豆</b></div>
+<div class="table-wrap">
+<table><tr><th class="day-c">日期</th><th>早餐</th><th>午餐</th><th>晚餐</th><th>下午茶</th></tr>
+<tr><td class="day-c">6/28日<br>D27</td><td>红枣姜茶+煎蛋2个+南瓜+黑芝麻</td><td>番茄牛肉汤80g(21gP)+糙米</td><td>猪肝小白菜汤+糙米+黑豆</td><td>猕猴桃1个+核桃</td></tr>
+<tr><td class="day-c">6/29一<br>D28</td><td>椰奶亚麻籽碗+煎蛋2个</td><td>牛肉+南瓜+小白菜</td><td>清蒸鳕鱼100g(17gP)+番茄蛋汤+糙米</td><td>猕猴桃1个+核桃</td></tr>
+<tr><td class="day-c">6/30二<br>D29</td><td>红枣姜茶+煎蛋2个+南瓜+黑芝麻</td><td>猪肝+番茄+糙米+黑豆</td><td>鳕鱼汤+小白菜+糙米</td><td>猕猴桃+核桃</td></tr>
+<tr><td class="day-c">7/1三<br>D30</td><td>红枣姜茶+煎蛋2个</td><td>牛肉+蔬菜+黑豆</td><td>温食汤面+鳕鱼</td><td>猕猴桃+核桃</td></tr></table>
+</div>
+<p class="note">每日目标：P55g F50g C140g | 过渡到下次经期。温热+补铁。鳕鱼温和好消化。6/4起进入新月经期。</p></div>
+
+</div>
+</div>
+
+
+<!-- ===== 食物营养 & 菜谱 ===== -->
+<div class="section" id="sec-nutrition">
+<div class="hero-bar" style="background:linear-gradient(135deg,#d35400,#e67e22)"><h1>食物营养 & 抗炎菜谱</h1><p>25种食物速查 · 6道快手菜 · 每100g营养含量</p></div>
+<div class="container">
+<div class="card">
+<h2>食物营养含量速查表（每100g）</h2>
+<div class="table-wrap">
+<h3>蛋白质来源</h3>
+<div class="table-wrap">
+<table><tr><th>食物</th><th>热量</th><th>蛋白</th><th>脂肪</th><th>碳水</th><th>铁mg</th><th>锌mg</th><th>特点</th></tr>
+<tr><td>猪肝</td><td>129</td><td>21g</td><td>3g</td><td>5g</td><td><b>22.6</b></td><td>5.8</td><td>补铁之王！每周1-2次</td></tr>
+<tr><td>鸡胸肉</td><td>118</td><td>24-26g</td><td>3.5g</td><td>0</td><td>1.0</td><td>0.9</td><td>减脂首选</td></tr>
+<tr><td>三文鱼</td><td>139</td><td>20g</td><td>13g</td><td>0</td><td>0.5</td><td>0.6</td><td>Omega-3最高</td></tr>
+<tr><td>鳕鱼</td><td>101</td><td>21g</td><td>1.2g</td><td>0</td><td>0.1</td><td>0.5</td><td>低脂高蛋白，肠胃温和</td></tr>
+<tr><td>大虾</td><td>99</td><td>17-19g</td><td>1g</td><td>0</td><td>1.0</td><td>1.1</td><td>低卡高蛋白</td></tr>
+<tr><td>鸡蛋(1个)</td><td>72</td><td>6g</td><td>5g</td><td>0.5g</td><td>1.0</td><td>0.6</td><td>全营养</td></tr>
+<tr><td>牛肉(瘦)</td><td>172</td><td>20g</td><td>10g</td><td>0</td><td>2.8</td><td>4.7</td><td>富含锌铁</td></tr></table>
+</div>
+
+<h3>豆类（植物蛋白+纤维）</h3>
+<div class="table-wrap">
+<table><tr><th>食物</th><th>热量</th><th>蛋白</th><th>脂肪</th><th>碳水</th><th>纤维</th><th>铁mg</th><th>GI</th></tr>
+<tr><td>鹰嘴豆(煮熟)</td><td>164</td><td>9g</td><td>2.6g</td><td>27g</td><td>8g</td><td>2.9</td><td>28-35 低</td></tr>
+<tr><td>黑豆(煮熟)</td><td>132</td><td>9g</td><td>0.5g</td><td>24g</td><td>9g</td><td>2.1</td><td>18 极低</td></tr>
+<tr><td>鲜豌豆</td><td>81</td><td>5.4g</td><td>0.4g</td><td>14g</td><td>5.7g</td><td>1.5</td><td>低</td></tr>
+<tr><td>豆腐(卤水)</td><td>81</td><td>8g</td><td>4g</td><td>2g</td><td>—</td><td>1.5</td><td>低</td></tr></table>
+</div>
+
+<h3>坚果种子（优质脂肪+微量元素）</h3>
+<div class="table-wrap">
+<table><tr><th>食物</th><th>热量</th><th>蛋白</th><th>脂肪</th><th>铁mg</th><th>锌mg</th><th>钙mg</th><th>特点</th></tr>
+<tr><td>黑芝麻</td><td>560</td><td>18g</td><td>40g</td><td><b>14.6</b></td><td>6.1</td><td><b>780</b></td><td>补钙铁之王！每天1勺</td></tr>
+<tr><td>南瓜籽</td><td>574</td><td>32g</td><td>49g</td><td>8.8</td><td><b>7.8</b></td><td>55</td><td>补锌之王+抑制DHT</td></tr>
+<tr><td>核桃</td><td>654</td><td>15g</td><td>65g</td><td>2.9</td><td>—</td><td>98</td><td>Omega-3+补脑</td></tr>
+<tr><td>腰果</td><td>574</td><td>18g</td><td>46g</td><td>6.7</td><td>5.3</td><td>37</td><td>补镁+锌</td></tr>
+<tr><td>亚麻籽(磨粉)</td><td>534</td><td>18g</td><td>42g</td><td>—</td><td>—</td><td>255</td><td>木脂素调节雌激素</td></tr></table>
+</div>
+
+<h3>蔬菜</h3>
+<div class="table-wrap">
+<table><tr><th>食物</th><th>热量</th><th>蛋白</th><th>纤维</th><th>铁mg</th><th>钙mg</th><th>GI</th><th>注意</th></tr>
+<tr><td>菠菜</td><td>18</td><td>2g</td><td>2g</td><td>2.5</td><td>70</td><td>15</td><td>配维C促铁吸收</td></tr>
+<tr><td>西兰花</td><td>33</td><td>2.8g</td><td>2.6g</td><td>1.0</td><td>67</td><td>10</td><td>含DIM助雌激素代谢</td></tr>
+<tr><td>口蘑(鲜)</td><td>22</td><td>2.9g</td><td>2.1g</td><td>1.3</td><td>8</td><td>低</td><td>极低热量+抗炎多糖</td></tr>
+<tr><td>胡萝卜</td><td>32</td><td>2g</td><td>—</td><td>1.9</td><td>19</td><td>生低/熟92</td><td>快炒好过煮烂</td></tr>
+<tr><td>秋葵</td><td>37</td><td>2g</td><td>3.9g</td><td>0.6</td><td>83</td><td>低</td><td>补钙+低热量</td></tr></table>
+</div>
+
+<h3>水果（低GI优选）</h3>
+<div class="table-wrap">
+<table><tr><th>食物</th><th>热量</th><th>碳水</th><th>纤维</th><th>GI</th><th>适合阶段</th></tr>
+<tr><td>蓝莓</td><td>57</td><td>14g</td><td>2.4g</td><td>40-53</td><td>全周期，黄体期抗氧化</td></tr>
+<tr><td>猕猴桃</td><td>61</td><td>14g</td><td>3g</td><td>52</td><td>月经期（维C促铁吸收）</td></tr>
+<tr><td>苹果</td><td>52</td><td>14g</td><td>2.4g</td><td>36</td><td>全周期，最安全水果</td></tr>
+<tr><td>香蕉</td><td>89</td><td>23g</td><td>2.6g</td><td>51</td><td>黄体期补镁钾（半根）</td></tr></table>
+</div>
+</div>
+
+<!-- 新菜谱推荐 -->
+<div class="card">
+<h2>好吃的抗炎菜谱（10分钟快手）</h2>
+
+<h3>豌豆胡萝卜炒虾仁 经典抗炎菜</h3>
+<p>虾仁100g + 鲜豌豆80g + 胡萝卜半根切丁<br>
+做法：胡萝卜焯水1分钟 → 热锅少油 → 虾仁炒变色 → 加胡萝卜豌豆翻炒2分钟 → 盐/生抽<br>
+<b>一盘约：P24g F5g C18g</b> | 高蛋白+补铁+β-胡萝卜素</p>
+
+<h3>口蘑豆腐汤 极低热量暖胃</h3>
+<p>口蘑4-5朵切片 + 嫩豆腐半块 + 菠菜少许<br>
+做法：口蘑加水煮开（不需要油！口蘑本身很鲜）→ 加豆腐块煮3分钟 → 放菠菜关火 → 盐+少许香油<br>
+<b>一碗约80kcal</b> | 补钙+植物蛋白+抗炎多糖</p>
+
+<h3>口蘑炒西兰花 10分钟快手</h3>
+<p>口蘑5朵 + 西兰花小半棵 + 蒜2瓣<br>
+做法：西兰花焯水30秒 → 蒜末爆香 → 口蘑先炒至出水 → 加西兰花翻炒1分钟 → 盐+生抽</p>
+
+<h3>胡萝卜口蘑炒鸡胸 午餐首选</h3>
+<p>鸡胸100g + 口蘑4朵 + 胡萝卜1/3根<br>
+做法：鸡胸切丁用盐+黑胡椒+淀粉腌10分钟 → 热锅少油 → 鸡胸炒变色 → 加胡萝卜口蘑翻炒 → 生抽出锅<br>
+<b>一盘约：P25g F6g C8g</b></p>
+
+<h3>豌豆藜麦饭 替代白米饭</h3>
+<p>藜麦和大米各一半浸泡30分钟 → 加冷冻豌豆一起煮<br>
+蛋白质比白米饭翻倍，GI大幅降低</p>
+
+<h3>万能焖菜（参考下厨房）</h3>
+<p>虾仁/鸡胸 + 西兰花 + 胡萝卜 + 豌豆 + 口蘑<br>
+做法：食材焯水 → 少油煎蛋白质 → 蒜末爆香 → 倒入蔬菜盖锅焖3分钟 → 淋酱汁（生抽3勺+香醋2勺+蚝油1勺）<br>
+<a href="https://m.xiachufang.com/recipe/106407098/" style="color:#ff4757">下厨房完整食谱</a></p>
+</div>
+
+<div class="card">
+<h2>食谱灵感来源</h2>
+<ul>
+<li>小红书搜索：<b>「抗炎一日三餐」「经期餐 补铁」「口蘑炒豌豆」「鹰嘴豆做法」</b></li>
+<li>推荐博主：<a href="https://www.xiaohongshu.com/user/profile/67ecfa1c000000000601f616" style="color:#ff4757">@LittleCC营养日常</a>（减脂/抗炎/经期餐专题）</li>
+<li>下厨房：<a href="https://m.xiachufang.com/recipe/106407098/" style="color:#ff4757">低卡焖菜万物皆可焖</a></li>
+<li>中国临床营养网抗炎饮食模板（网易/澎湃）</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 营养补给 ===== -->
+<div class="section" id="sec-supp">
+<div class="hero-bar"><h1>分阶段营养补给方案（最终版）</h1><p>每天最多3种 · 已有6种+额外买2种 · 肠胃友好 · 肾脏低负担</p></div>
+<div class="container">
+
+<div class="card">
+<h2>你已有的补剂</h2>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>已含成分</th><th>能替代什么</th></tr>
+<tr><td><b>Swisse女性多维</b></td><td>B族全套+锌5mg+铁4.9mg+维C165mg+硒26μg+南非醉茄500mg+镁105mg(氧化镁)</td><td>替代单独的B族、锌、硒、南非醉茄</td></tr>
+<tr><td><b>Swisse葡萄籽</b></td><td>OPC原花青素（强抗氧化）</td><td>抗炎+护肤，月经期暂停（影响铁吸收）</td></tr>
+<tr><td><b>维C泡腾片</b></td><td>维C（已溶解形式）</td><td>替代维C片，肠胃更温和</td></tr>
+</table>
+</div>
+</div>
+
+<div class="supp-card men">
+<h4>月经期 D1-7（6/4-6/10）· 每天3种</h4>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
+<tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>基础B族+微量元素</td></tr>
+<tr><td><b>铁剂</b>(甘氨酸亚铁) + <b>维C泡腾片</b> <span class="tag t-om">已有泡腾片</span></td><td>铁18mg + 维C</td><td>午餐后同服</td><td>经血失铁→疲劳犯困。维C促铁吸收</td></tr>
+<tr><td><b>甘氨酸镁</b></td><td>400mg</td><td>睡前</td><td>缓解经痛+助眠+降皮质醇</td></tr>
+</table>
+</div>
+<p class="why">葡萄籽本阶段暂停——OPC多酚会抑制铁吸收，和铁剂冲突。多维中铁仅4.9mg不够，需额外补。</p>
+</div>
+
+<div class="supp-card fol">
+<h4>卵泡期 D8-13（6/11-6/16）· 每天3种</h4>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
+<tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B族催化线粒体产能，缓解犯困</td></tr>
+<tr><td><b>鱼油</b> <span class="tag t-om">已有</span></td><td>1粒(EPA270+DHA180mg)</td><td>午餐随餐</td><td>抗炎+改善肠道+DHA缓解犯困</td></tr>
+<tr><td><b>甘氨酸锌</b></td><td>15-25mg</td><td>晚餐随餐</td><td>修复肠道+抗炎+调节皮脂腺+支持卵泡发育</td></tr>
+</table>
+</div>
+<p class="why">能量恢复期，身体吸收最好。鱼油Omega-3抗炎+锌修复肠道双管齐下。葡萄籽恢复服用（空腹/两餐间，算食补不算补剂）。</p>
+</div>
+
+<div class="supp-card ovu">
+<h4>排卵期 D14-16（6/17-6/19）· 每天3种</h4>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
+<tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>维持高代谢支持</td></tr>
+<tr><td><b>鱼油</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>午餐随餐</td><td>抗炎+支持排卵后黄体形成</td></tr>
+<tr><td><b>Swisse葡萄籽</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>空腹/两餐间</td><td>抗氧化保护卵子质量</td></tr>
+</table>
+</div>
+<p class="why">身体最佳状态，维持即可。</p>
+</div>
+
+<div class="supp-card lut">
+<h4>黄体早期 D17-23（6/20-6/26）· 每天3种</h4>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
+<tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B5含量69mg支持孕酮合成</td></tr>
+<tr><td><b>鱼油</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>午餐随餐</td><td>Omega-3抗炎，经前防痘核心</td></tr>
+<tr><td><b>镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>稳情绪+助眠+降皮质醇→保护孕酮</td></tr>
+</table>
+</div>
+<p class="why">防痘窗口开启！鱼油抗炎+镁降皮质醇+多维B5保孕酮。维C泡腾片可隔天加喝。葡萄籽继续空腹吃。</p>
+</div>
+
+<div class="supp-card lut" style="border-color:#6c3483;background:#f5eaff">
+<h4>黄体晚期 D24-30（6/27-7/3）· 每天3种</h4>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>剂量</th><th>时间</th><th>为什么</th></tr>
+<tr><td><b>Swisse女性多维</b> <span class="tag t-om">已有</span></td><td>1片</td><td>早餐随餐</td><td>B5+B6支持孕酮+神经递质</td></tr>
+<tr><td><b>鱼油</b> <span class="tag t-om">已有</span></td><td>1粒</td><td>午餐随餐</td><td>经前皮质醇飙升，Omega-3对抗炎症</td></tr>
+<tr><td><b>镁</b> <span class="tag t-om">已有</span></td><td>400mg</td><td>睡前</td><td>经前情绪波动最大，镁是GABA的关键辅助</td></tr>
+</table>
+</div>
+<p class="why" style="color:#c0392b">防痘决战期！配合控糖饮食+早睡+阿达帕林。维C泡腾片经前可每天喝。葡萄籽继续。</p>
+</div>
+
+<div class="card">
+<h2>我的补剂清单（实际购买版）</h2>
+<div class="table-wrap">
+<table>
+<tr><th>阶段</th><th>补剂①</th><th>补剂②</th><th>补剂③</th><th>额外(食补)</th></tr>
+<tr><td style="background:#ffe0e0">月经期</td><td>女性多维 <span class="tag t-om">已有</span></td><td>铁+维C泡腾片(同服)</td><td>镁(睡前) <span class="tag t-om">已有</span></td><td>亚麻籽粉</td></tr>
+<tr><td style="background:#e0f7e0">卵泡期</td><td>女性多维 <span class="tag t-om">已有</span></td><td>鱼油(随餐) <span class="tag t-om">已有</span></td><td>甘氨酸锌</td><td>葡萄籽+亚麻籽粉</td></tr>
+<tr><td style="background:#fff3e0">排卵期</td><td>女性多维 <span class="tag t-om">已有</span></td><td>鱼油(随餐) <span class="tag t-om">已有</span></td><td>葡萄籽 <span class="tag t-om">已有</span></td><td>亚麻籽粉</td></tr>
+<tr><td style="background:#f3e0ff">黄体早</td><td>女性多维 <span class="tag t-om">已有</span></td><td>鱼油(随餐) <span class="tag t-om">已有</span></td><td>镁(睡前) <span class="tag t-om">已有</span></td><td>葡萄籽+维C泡腾片</td></tr>
+<tr><td style="background:#e8d5f5">黄体晚</td><td>女性多维 <span class="tag t-om">已有</span></td><td>鱼油(随餐) <span class="tag t-om">已有</span></td><td>镁(睡前) <span class="tag t-om">已有</span></td><td>葡萄籽+维C泡腾片</td></tr>
+</table>
+</div>
+
+<h3 style="margin-top:16px">需额外购买（仅2种！）</h3>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>推荐产品</th><th>价格</th><th>使用阶段</th></tr>
+<tr><td><b>甘氨酸亚铁</b></td><td>Perdays活性铁元24mg+维C（国内）或 Solgar Gentle Iron 25mg</td><td>~¥28-80</td><td>仅月经期7天</td></tr>
+<tr><td><b>甘氨酸锌</b></td><td>15-25mg/片（锌吡啶甲酸盐亦可）</td><td>~¥40</td><td>卵泡期6天</td></tr>
+</table>
+</div>
+<p class="note">D3+K2：多维已含D3 1000IU（够日常），K2从饮食补（纳豆/发酵食品）。如后续想加量可买D3+K2复合。</p>
+</div>
+
+<div class="card">
+<h2>博主提到但不需要额外买的</h2>
+<div class="table-wrap">
+<table>
+<tr><th>补剂</th><th>为什么不用买</th></tr>
+<tr><td>硒</td><td>女性多维已含26μg，接近RDA。单独补有中毒风险</td></tr>
+<tr><td>南非醉茄</td><td>女性多维已含500mg干根当量</td></tr>
+<tr><td>钙</td><td>补剂增加17%肾结石风险。通过豆腐/深绿叶菜/钙强化豆浆补</td></tr>
+<tr><td>NAC</td><td>第二阶段考虑（1-2月后效果不够时加入）</td></tr>
+<tr><td>DIM</td><td>第二阶段考虑（需增强吸收型）</td></tr>
+<tr><td>谷氨酰胺</td><td>第二阶段考虑（肠胃是主要困扰时）</td></tr>
+</table>
+</div>
+</div>
+
+<div class="card">
+<p class="note">全程每天1勺亚麻籽粉加入早餐（食物，不算补剂）。这是最低负担的Omega-3+木脂素来源。奇亚籽泡发后使用。</p>
+</div>
+
+</div>
+</div>
+
+<div class="footer">个人定制 | 经期6/4 | 周期30天 | 无乳制品 | 肠胃敏感<br>本文不构成医疗建议</div>
+
+</div>
+
+<script>
+function go(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(n=>n.classList.remove('active'));
+
+  var sec = document.getElementById('sec-'+id);
+  if(sec) sec.classList.add('active');
+
+  // Sidebar highlight
+  if(el && el.classList.contains('nav-item')) el.classList.add('active');
+
+  // Bottom nav highlight
+  document.querySelectorAll('.bn-item[data-sec="'+id+'"]').forEach(function(b){b.classList.add('active');});
+  // Also highlight sidebar item matching this id
+  document.querySelectorAll('.nav-item').forEach(function(n){
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').indexOf("'"+id+"'")!==-1) n.classList.add('active');
+  });
+
+  window.scrollTo(0,0);
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+
+// ===== 周期数据 =====
+var CYCLE_START = new Date(2026, 5, 4); // 5月5日
+var CYCLE_LEN = 30;
+var WEEKDAYS = ['日','一','二','三','四','五','六'];
+
+var PHASE_DATA = {
+  men: {name:'月经期', color:'#c0392b', supp:'女性多维(早餐) + Thorne铁25mg+维C泡腾片(午餐后) + D3K2滴剂(午餐) + 镁(睡前)', focus:'补铁·温热饮食·轻柔运动·早睡·停用酸类护肤品', warn:'避免冷饮、咖啡、辛辣；铁和镁分开2小时'},
+  fol: {name:'卵泡期', color:'#27ae60', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + NOW锌30mg隔天(晚餐)', focus:'高蛋白增肌·力量训练·葡萄籽恢复·能量最强', warn:'趁能量好储备体能，不要放松饮食控制'},
+  ovu: {name:'排卵期', color:'#e67e22', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 葡萄籽(空腹) + NOW锌隔天', focus:'峰值爆发力·十字花科蔬菜·注意韧带', warn:'韧带较松，运动充分热身'},
+  lut: {name:'黄体早期', color:'#8e44ad', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 镁(睡前)', focus:'控糖防痘·补镁·维持运动·早睡', warn:'开始严格控糖！减少碳水，增加脂肪蛋白'},
+  lut2:{name:'黄体晚期', color:'#6c3483', supp:'女性多维(早餐) + D3K2滴剂+鱼油(午餐) + 镁(睡前)', focus:'防痘决战·绝对控糖·阿达帕林·11点前睡', warn:'禁奶茶甜品炸鸡！坚持阿达帕林每晚用'}
+};
+
+// 每天的饮食数据 (Day 1-30)
+var MEALS = {
+  1:{b:'红枣姜茶+煮蛋2个+亚麻籽粉',l:'猪肝+菠菜汤+南瓜',d:'牛腱肉+荞麦面+菠菜',t:'猕猴桃+核桃'},
+  2:{b:'南瓜块+煎蛋2个+姜茶+黑芝麻',l:'牛腱肉+菠菜+南瓜',d:'三文鱼+荞麦面+蛋花汤',t:'猕猴桃+核桃'},
+  3:{b:'红枣姜茶+煮蛋2个+亚麻籽粉+黑芝麻',l:'猪肝+菠菜汤+南瓜块',d:'牛腱肉+荞麦面+菠菜',t:'猕猴桃+核桃'},
+  4:{b:'南瓜块+煎蛋2个+姜茶+黑芝麻',l:'牛腱肉+菠菜+南瓜',d:'三文鱼+荞麦面+蛋花汤',t:'猕猴桃+核桃'},
+  5:{b:'红枣姜茶+煎蛋2个+亚麻籽粉',l:'猪肝+三文鱼拌荞麦面',d:'牛腱肉汤+菠菜+南瓜',t:'猕猴桃+核桃'},
+  6:{b:'椰奶亚麻籽粉+煎蛋2个',l:'番茄蛋汤+糙米+南瓜蒸块',d:'白灼大虾+小白菜+糙米',t:'苹果+杏仁'},
+  7:{b:'南瓜粥(椰奶版)+煎蛋2个',l:'鸡胸+小白菜+糙米',d:'番茄豆腐汤+虾仁炒蛋',t:'苹果+杏仁'},
+  8:{b:'椰奶黑豆浆+煮蛋2个',l:'鸡胸+番茄+糙米',d:'豆腐虾仁煲+南瓜',t:'苹果+杏仁'},
+  9:{b:'牛油果煎蛋+亚麻籽粉',l:'煎三文鱼+藜麦+西兰花',d:'煎牛排+芦笋',t:'蓝莓+南瓜籽'},
+  10:{b:'牛油果蛋杯+南瓜籽+黑芝麻',l:'三文鱼藜麦碗+西兰花',d:'牛排+鹰嘴豆沙拉',t:'蓝莓+南瓜籽'},
+  11:{b:'煎蛋2个+南瓜籽+椰奶',l:'芦笋鸡胸(外食)',d:'三文鱼+鹰嘴豆+藜麦',t:'蓝莓+南瓜籽'},
+  12:{b:'奇亚籽椰奶布丁+煎蛋2个',l:'鸡腿+紫甘蓝+糙米',d:'清蒸鳕鱼+秋葵+蘑菇汤',t:'橙子+腰果'},
+  13:{b:'鸡蛋2个+胡萝卜+亚麻籽粉+黑芝麻',l:'椰奶鸡腿咖喱+糙米',d:'蒜蓉大虾+紫甘蓝+蘑菇',t:'橙子+腰果'},
+  14:{b:'奇亚籽碗+煎蛋+南瓜籽',l:'蘑菇鸡肉饭+秋葵',d:'大虾+鳕鱼汤+蔬菜',t:'橙子+腰果'},
+  15:{b:'煎蛋2个+山药泥+亚麻籽粉+黑芝麻',l:'三文鱼+菠菜+荞麦面',d:'羊肉片汤+黑木耳+山药',t:'香蕉半根+腰果+黑巧'},
+  16:{b:'椰奶姜黄拿铁+煎蛋2个+腰果',l:'羊肉菠菜汤+荞麦面+黑豆',d:'三文鱼+山药',t:'香蕉半根+腰果+黑巧'},
+  17:{b:'鸡蛋2个+腰果+黑巧+黑芝麻',l:'三文鱼饭团+黑豆',d:'羊肉汤面+菠菜',t:'香蕉半根+腰果'},
+  18:{b:'牛油果煎蛋2个+亚麻籽粉',l:'鸡胸+南瓜+少量糙米',d:'清蒸鳕鱼+深绿叶菜',t:'蓝莓+核桃'},
+  19:{b:'南瓜椰奶粥+煎蛋2个+核桃',l:'鸡胸鹰嘴豆沙拉+牛油果',d:'鳕鱼+深绿叶菜+少量糙米',t:'蓝莓+核桃'},
+  20:{b:'椰奶亚麻籽碗+煎蛋+黑芝麻',l:'南瓜鸡肉+鹰嘴豆饭',d:'鳕鱼汤+绿叶菜',t:'蓝莓+核桃'},
+  21:{b:'南瓜块+煎蛋2个+亚麻籽粉+黑芝麻',l:'牛腱肉+西兰花+荞麦面',d:'大虾蘑菇汤+南瓜',t:'苹果+南瓜籽'},
+  22:{b:'蘑菇炒蛋2个+南瓜块',l:'牛肉丝+洋葱+西兰花+荞麦面',d:'大虾+蘑菇蔬菜汤',t:'苹果+南瓜籽'},
+  23:{b:'煎蛋2个+椰奶+黑芝麻',l:'牛肉+南瓜+西兰花(带饭)',d:'洋葱虾仁+荞麦面',t:'苹果+南瓜籽'},
+  24:{b:'牛油果煎蛋2个+亚麻籽粉+黑芝麻',l:'三文鱼+菠菜+荞麦面',d:'鸡腿+山药汤',t:'蓝莓+腰果+黑巧'},
+  25:{b:'椰奶姜黄拿铁+煎蛋2个+腰果',l:'鸡腿+牛油果+鹰嘴豆菠菜沙拉',d:'三文鱼+山药+荞麦面',t:'蓝莓+腰果+黑巧'},
+  26:{b:'煎蛋2个+黑巧2块+腰果+黑芝麻',l:'外食选蛋白+蔬菜',d:'三文鱼菠菜汤+山药',t:'蓝莓+腰果'},
+  27:{b:'红枣姜茶+煎蛋2个+南瓜+黑芝麻',l:'番茄牛肉汤+糙米',d:'猪肝小白菜汤+糙米+黑豆',t:'猕猴桃+核桃'},
+  28:{b:'椰奶亚麻籽碗+煎蛋2个',l:'牛肉+南瓜+小白菜',d:'清蒸鳕鱼+番茄蛋汤+糙米',t:'猕猴桃+核桃'},
+  29:{b:'红枣姜茶+煎蛋2个+南瓜+黑芝麻',l:'猪肝+番茄+糙米+黑豆',d:'鳕鱼汤+小白菜+糙米',t:'猕猴桃+核桃'},
+  30:{b:'红枣姜茶+煎蛋2个',l:'牛肉+蔬菜+黑豆',d:'温食汤面+鳕鱼',t:'猕猴桃+核桃'}
+};
+
+function getPhase(day) {
+  if (day <= 7) return 'men';
+  if (day <= 13) return 'fol';
+  if (day <= 16) return 'ovu';
+  if (day <= 23) return 'lut';
+  return 'lut2';
+}
+
+function getCycleDay() {
+  var today = new Date();
+  today.setHours(0,0,0,0);
+  var start = new Date(CYCLE_START);
+  start.setHours(0,0,0,0);
+  var diff = Math.floor((today - start) / 86400000) + 1;
+  if (diff < 1 || diff > CYCLE_LEN) return null;
+  return diff;
+}
+
+function renderTodayCard(day) {
+  var card = document.getElementById('today-card-dynamic');
+  if (!day || !MEALS[day]) { card.style.display='none'; return; }
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var m = MEALS[day];
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var dateStr = (dateObj.getMonth()+1) + '月' + dateObj.getDate() + '日 周' + WEEKDAYS[dateObj.getDay()];
+
+  card.innerHTML = '<div class="tc-title">今日速查 — ' + dateStr +
+    ' <span class="tc-badge" style="background:'+pd.color+'">Day '+day+' '+pd.name+'</span></div>' +
+    '<div class="today-grid">' +
+    '<div class="today-block" style="grid-column:1/-1"><h4>今日饮食</h4>' +
+    '<table class="today-meals"><tr><td>早餐</td><td>'+m.b+'</td></tr>' +
+    '<tr><td>午餐</td><td>'+m.l+'</td></tr>' +
+    '<tr><td>晚餐</td><td>'+m.d+'</td></tr>' +
+    '<tr><td>下午茶</td><td>'+m.t+'</td></tr></table></div>' +
+    '<div class="today-block"><h4>今日补剂</h4><div class="supp-pills">' + pd.supp.split('+').map(function(s){return '<span class="supp-pill">'+s.trim()+'</span>'}).join('') + '</div></div>' +
+    '<div class="today-block"><h4>阶段重点</h4><ul class="focus-list">' + pd.focus.split('·').map(function(s){return '<li>'+s.trim()+'</li>'}).join('') + '</ul></div></div>' +
+    '<div class="warn-box"><b>注意：</b>' + pd.warn + '</div>';
+  card.style.display = 'block';
+}
+
+function showDay(day) {
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var m = MEALS[day] || {b:'-',l:'-',d:'-',t:'-'};
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var dateStr = (dateObj.getMonth()+1) + '/' + dateObj.getDate() + ' 周' + WEEKDAYS[dateObj.getDay()];
+
+  var popup = document.getElementById('day-popup');
+  document.getElementById('day-popup-content').innerHTML =
+    '<h3 style="color:'+pd.color+';margin-bottom:12px">'+dateStr+' · Day '+day+' '+pd.name+'</h3>' +
+    '<h4 style="font-size:13px;color:#888;margin:10px 0 6px">饮食计划</h4>' +
+    '<table style="font-size:13px"><tr><td style="font-weight:600;color:'+pd.color+';width:60px">早餐</td><td>'+m.b+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">午餐</td><td>'+m.l+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">晚餐</td><td>'+m.d+'</td></tr>' +
+    '<tr><td style="font-weight:600;color:'+pd.color+'">下午茶</td><td>'+m.t+'</td></tr></table>' +
+    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">补剂</h4><p style="font-size:13px">'+pd.supp+'</p>' +
+    '<h4 style="font-size:13px;color:#888;margin:12px 0 6px">重点</h4><p style="font-size:13px">'+pd.focus+'</p>' +
+    '<div class="warn-box" style="margin-top:12px"><b>注意：</b>'+pd.warn+'</div>';
+  popup.style.display = 'flex';
+}
+
+// 页面加载时：高亮今天 + 渲染今日速查 + 更新标题
+(function(){
+  var day = getCycleDay();
+  if (!day) return;
+
+  // 高亮日历中的今天
+  document.querySelectorAll('.cal-d[data-day]').forEach(function(el){
+    el.classList.remove('today');
+    if (parseInt(el.getAttribute('data-day')) === day) {
+      el.classList.add('today');
+      el.querySelector('.inf').textContent = 'D'+day+' 今天';
+    }
+  });
+
+  // 渲染今日速查卡片
+  renderTodayCard(day);
+
+  // 更新hero badge
+  var phase = getPhase(day);
+  var pd = PHASE_DATA[phase];
+  var badges = document.querySelectorAll('.badge');
+  badges.forEach(function(b){ b.textContent = '今天 Day '+day+' '+pd.name; });
+
+  // 更新subtitle
+  var dateObj = new Date(CYCLE_START);
+  dateObj.setDate(dateObj.getDate() + day - 1);
+  var heroP = document.querySelector('.hero-bar p');
+  if(heroP) heroP.textContent = '经期6月4日 · 周期30天 · 今天Day'+day+' '+pd.name+' · 无乳制品 · 肠胃敏感';
+})();
+
+</script>
+</body>
+</html>
